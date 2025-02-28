@@ -4,6 +4,7 @@
     <title>Phone Guessr</title>
     <link rel="icon" type="image/x-icon" href="../assets/logos/logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             display: flex;
@@ -11,6 +12,7 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
+            font-family: 'Unbounded', sans-serif;
         }
         .center {
             text-align: center;
@@ -22,8 +24,16 @@
         .fade-in {
             opacity: 1 !important;
         }
-        #revealButton {
+        button {
             background-color: #C9ECC6;
+            border-radius: 15px;
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        .invalid-choice {
+            color: grey;
         }
     </style>
 </head>
@@ -38,7 +48,7 @@
             <option value="OnePlus 13">
         </datalist>
         <p id="phonename" style="display:none;">Phone Name</p>
-        <p id="feedback" style="display:none;"></p>
+        <p id="feedback" style="display:none;" class="invalid-choice"></p>
         <button id="revealButton" onclick="revealphone()">Reveal Phone</button>
         <button id="guessAgainButton" onclick="resetGame()" style="display:none;">Guess Again</button>
     </div>
@@ -101,6 +111,7 @@
             if (!validChoices.includes(guessInput)) {
                 feedbackElement.innerHTML = "Please enter a valid choice.";
                 feedbackElement.style.display = "block";
+                feedbackElement.classList.add("invalid-choice");
                 playSound('../assets/sounds/invalid.wav');
                 return;
             }
@@ -112,7 +123,7 @@
                 feedbackElement.classList.add("animate__animated", "animate__tada");
                 playSound('../assets/sounds/correct.wav');
             } else {
-                feedbackElement.innerHTML = `You got it wrong! The correct phone is ${phoneselection}.`;
+                feedbackElement.innerHTML = `You got ${phoneselection} wrong!`;
                 feedbackElement.style.color = "red";
                 feedbackElement.classList.add("animate__animated", "animate__headshake");
                 playSound('../assets/sounds/incorrect.wav');
