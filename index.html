@@ -2,10 +2,14 @@
 <html>
 <head>
     <title>Phone Guessr</title>
+    <!-- Favicon for the page -->
     <link rel="icon" type="image/x-icon" href="../assets/logos/logo.png">
+    <!-- External CSS for animations -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* General body styling */
         body {
             display: flex;
             align-items: center;
@@ -16,36 +20,45 @@
             background-color: #f5f5f5;
             color: #333;
         }
+        /* Center align text */
         .center {
             text-align: center;
         }
+        /* Initial styling for phone specifications */
         .spec {
             opacity: 0;
             transition: opacity 1s;
         }
+        /* Fade-in effect for phone specifications */
         .fade-in {
             opacity: 1 !important;
         }
+        /* Button styling */
         button {
             background-color: #C9ECC6;
             border-radius: 15px;
-            margin: 10px;
+            margin: 10px auto; /* Center the button horizontally */
             padding: 10px 20px;
             border: none;
             cursor: pointer;
             font-size: 16px;
             transition: background-color 0.3s;
+            display: block; /* Ensure the button is treated as a block element */
         }
+        /* Hover effect for buttons */
         button:hover {
             background-color: #b0d8a8;
         }
+        /* Styling for invalid choice feedback */
         .invalid-choice {
             color: grey;
         }
+        /* Styling for empty input feedback */
         .empty-input {
             color: grey;
             display: none;
         }
+        /* Input field styling */
         #guessInput {
             width: 300px;
             padding: 10px;
@@ -56,9 +69,11 @@
             outline: none;
             transition: border-color 0.3s;
         }
+        /* Focus effect for input field */
         #guessInput:focus {
             border-color: #C9ECC6;
         }
+        /* Styling for datalist options */
         datalist {
             font-size: 16px;
         }
@@ -66,21 +81,27 @@
 </head>
 <body>
     <div class="center">
+        <!-- Container for phone specifications -->
         <div id="phonespecs"></div>
+        <!-- Input field for guessing the phone -->
         <input list="phones" id="guessInput" name="phoneGuess" placeholder="Guess the phone...">
+        <!-- Datalist options for the input field -->
         <datalist id="phones">
             <option value="Google Pixel Fold">
             <option value="Apple iPhone 16e">
             <option value="Samsung S25 Ultra">
             <option value="OnePlus 13">
         </datalist>
+        <!-- Hidden elements for phone name and feedback -->
         <p id="phonename" style="display:none;">Phone Name</p>
         <p id="feedback" style="display:none;" class="invalid-choice"></p>
         <p id="emptyFeedback" class="empty-input">Input cannot be empty.</p>
+        <!-- Buttons for reveal and reset actions -->
         <button id="revealButton" onclick="revealphone()">Reveal Phone</button>
         <button id="guessAgainButton" onclick="resetGame()" style="display:none;">Guess Again</button>
     </div>
     <script>
+        // Function to initialize the game
         function initializeGame() {
             const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13"];
             const phonespecs = [
@@ -90,10 +111,12 @@
                 ["50MP camera", "12/24GB RAM", "6000mAh", "Snapdragon 8 Elite", "6.82 inch screen"]
             ];
 
+            // Randomly select a phone and its specifications
             const randomphone = Math.floor(Math.random() * phones.length);
             const phoneselection = phones[randomphone];
             const specselection = phonespecs[randomphone];
 
+            // Display the specifications with a fade-in effect
             const specContainer = document.getElementById("phonespecs");
             specContainer.innerHTML = "";
             specselection.forEach((spec, index) => {
@@ -104,11 +127,13 @@
                 specContainer.appendChild(specElement);
             });
 
+            // Add fade-in class to specifications after a short delay
             setTimeout(() => {
                 const specElements = document.querySelectorAll(".spec");
                 specElements.forEach(element => element.classList.add("fade-in"));
             }, 100);
 
+            // Hide and show the necessary elements
             document.getElementById("phonename").innerHTML = phoneselection;
             document.getElementById("phonename").style.display = "none";
             document.getElementById("feedback").style.display = "none";
@@ -118,6 +143,7 @@
             document.getElementById("guessInput").value = ""; // Clear the input text
         }
 
+        // Function to reveal the phone name based on user's guess
         function revealphone() {
             const guessInput = document.getElementById("guessInput").value;
             const phoneNameElement = document.getElementById("phonename");
@@ -126,11 +152,13 @@
             const revealButtonElement = document.getElementById("revealButton");
             const guessAgainButtonElement = document.getElementById("guessAgainButton");
 
+            // Check if all necessary elements are found
             if (!feedbackElement || !phoneNameElement || !emptyFeedbackElement || !revealButtonElement || !guessAgainButtonElement) {
                 console.error("One or more necessary elements not found.");
                 return;
             }
 
+            // Handle empty input
             if (guessInput === "") {
                 emptyFeedbackElement.style.display = "block";
                 playSound('../assets/sounds/invalid.wav');
@@ -144,6 +172,7 @@
                 return;
             }
 
+            // Check if the guess is valid
             const validChoices = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13"];
             if (!validChoices.includes(guessInput)) {
                 feedbackElement.innerHTML = "Please enter a valid choice.";
@@ -153,6 +182,7 @@
                 return;
             }
 
+            // Check if the guess is correct
             const phoneselection = phoneNameElement.innerHTML;
             if (guessInput === phoneselection) {
                 feedbackElement.innerHTML = "You got it right!";
@@ -166,6 +196,7 @@
                 playSound('../assets/sounds/incorrect.wav');
             }
 
+            // Display the phone name and feedback, hide the reveal button, and show the guess again button
             phoneNameElement.style.display = "block";
             phoneNameElement.classList.add("animate__animated", "animate__zoomIn");
             feedbackElement.style.display = "block";
@@ -173,6 +204,7 @@
             guessAgainButtonElement.style.display = "block";
         }
 
+        // Function to play sound effects
         function playSound(filePath) {
             const audio = new Audio(filePath);
             audio.play().catch(err => {
@@ -180,12 +212,15 @@
             });
         }
 
+        // Function to reset the game
         function resetGame() {
             initializeGame();
         }
 
+        // Initialize the game when the document is fully loaded
         document.addEventListener("DOMContentLoaded", initializeGame);
 
+        // Play sound effects based on key presses
         document.addEventListener("keydown", function(event) {
             if (event.key === "1") {
                 playSound('../assets/sounds/tip1.wav');
