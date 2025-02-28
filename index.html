@@ -63,6 +63,7 @@
             if (guessInput === "") {
                 feedbackElement.innerHTML = "Input cannot be empty.";
                 feedbackElement.style.display = "block";
+                playSound('../assets/sounds/invalid.wav');
                 return;
             }
 
@@ -70,6 +71,7 @@
             if (!validChoices.includes(guessInput)) {
                 feedbackElement.innerHTML = "Please enter a valid choice.";
                 feedbackElement.style.display = "block";
+                playSound('../assets/sounds/invalid.wav');
                 return;
             }
 
