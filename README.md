@@ -11,6 +11,7 @@ PhoneGuessr is a fun and engaging game where you have to guess the phone based o
 - Leaderboard to compete with friends
 - Hints to help you guess the phone
 
+![PhoneGuessr Logo](assets/soontobe.png)
 ## Installation
 To install and set up PhoneGuessr, follow these steps:
 1. Clone the repository: `git clone https://github.com/HenryTheAddict/PhoneGuessr.git`
