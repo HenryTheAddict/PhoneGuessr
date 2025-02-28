@@ -1,4 +1,4 @@
-# PhoneGuessr's Cool Logo
+# PhoneGuessr
 
 ![PhoneGuessr Logo](assets/logos/fulllogo.png)
 
