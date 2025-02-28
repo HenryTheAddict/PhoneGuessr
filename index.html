@@ -20,13 +20,14 @@
         }
         #guessInput {
             position: relative;
-            font-family: inherit;
+            font-family: 'Unbounded', sans-serif;
+            font-size: 1rem;
             background: transparent;
         }
         #autocompleteWrapper {
             position: relative;
             display: inline-block;
-            width: 100%;
+            width: 50%; /* Set the width of the input box to 50% of the screen width */
         }
         #autocompletePlaceholder {
             position: absolute;
@@ -35,8 +36,11 @@
             transform: translateY(-50%);
             color: #ccc;
             pointer-events: none;
+            font-family: 'Unbounded', sans-serif;
             font-size: 1rem;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
 </head>
@@ -45,9 +49,9 @@
         <!-- Container for phone specifications -->
         <div id="phonespecs" class="flex justify-center gap-2.5"></div>
         <!-- Input field for guessing the phone -->
-        <div id="autocompleteWrapper" class="relative w-72 mx-auto my-5">
+        <div id="autocompleteWrapper" class="relative w-1/2 mx-auto my-5">
             <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="w-full py-2.5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300">
-            <div id="autocompletePlaceholder"></div>
+            <div id="autocompletePlaceholder" class="hidden"></div>
         </div>
         <!-- Hidden elements for phone name and feedback -->
         <p id="phonename" class="hidden">Phone Name</p>
@@ -205,8 +209,7 @@
                     const remaining = match.substring(value.length);
                     
                     // Replace the typed text with spaces to maintain the correct position
-                    const whitespace = value.replace(/./g, '&nbsp;');
-                    autocompletePlaceholder.innerHTML = `<span style="visibility:hidden">${whitespace}</span>${remaining}`;
+                    autocompletePlaceholder.innerHTML = `<span style="visibility:hidden">${value}</span>${remaining}`;
                     autocompletePlaceholder.classList.remove("hidden");
                 } else {
                     autocompletePlaceholder.innerHTML = "";
@@ -215,11 +218,14 @@
             });
 
             input.addEventListener("keydown", function(e) {
-                if (e.key === "Tab" && autocompletePlaceholder.innerHTML !== "") {
+                if (e.key === "Tab" && !autocompletePlaceholder.classList.contains("hidden")) {
                     e.preventDefault();
-                    input.value = autocompletePlaceholder.innerText.trim();
-                    autocompletePlaceholder.innerHTML = "";
-                    autocompletePlaceholder.classList.add("hidden");
+                    const match = phones.find(phone => phone.toLowerCase().startsWith(input.value.toLowerCase()));
+                    if (match) {
+                        input.value = match;
+                        autocompletePlaceholder.innerHTML = "";
+                        autocompletePlaceholder.classList.add("hidden");
+                    }
                 }
             });
         });
