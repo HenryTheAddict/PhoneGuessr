@@ -67,8 +67,11 @@
         <datalist id="phones">
             <option value="Google Pixel Fold">
             <option value="Apple iPhone 16e">
-            <option value="Samsung S25 Ultra">
+            <option value="Samsung Galaxy S25 Ultra">
             <option value="OnePlus 13">
+            <option value="Apple iPhone 16">
+            <option value="Samsung Galaxy S24 Ultra">
+            <option value="Google Pixel 9">
         </datalist>
         <p id="phonename" style="display:none;">Phone Name</p>
         <p id="feedback" style="display:none;" class="invalid-choice"></p>
@@ -77,12 +80,15 @@
     </div>
     <script>
         function initializeGame() {
-            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13"];
+            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung Galaxy S25 Ultra", "OnePlus 13", "Apple iPhone 16", "Samsung Galaxy S24 Ultra", "Google Pixel 9"];
             const phonespecs = [
                 ["48MP camera", "12GB RAM", "4821 mAh", "Tensor G2", "7.6 inch screen"],
                 ["48MP camera", "8GB RAM", "unknown", "A18 Bionic Chip", "6.1 inch screen"],
                 ["200MP camera", "12/16GB RAM", "5000mAh", "Snapdragon 8 Elite", "6.9 inch screen"],
-                ["50MP camera", "12/24GB RAM", "6000mAh", "Snapdragon 8 Elite", "6.82 inch screen"]
+                ["50MP camera", "12/24GB RAM", "6000mAh", "Snapdragon 8 Elite", "6.82 inch screen"],
+                ["48MP camera", "8GB RAM", "3561mAh", "A18 Bionic Chip", "6.1 inch screen"],
+                ["200MP camera", "12GB RAM", "5000mAh", "Snapdragon 8 Gen 3", "6.8 inch screen"],
+                ["50MP camera", "12GB RAM", "4700mAh", "Tensor G4", "6.3 inch screen"]
             ];
 
             const randomphone = Math.floor(Math.random() * phones.length);
