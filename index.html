@@ -10,35 +10,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        #guessInput::placeholder {
+            color: gray;
+        }
+        #guessInput.autocomplete-highlight::after {
+            content: attr(data-autocomplete);
+            color: #ccc;
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-white">
     <div class="text-center mt-4">
         <!-- Container for phone specifications -->
         <div id="phonespecs" class="flex justify-center gap-2.5"></div>
         <!-- Input field for guessing the phone -->
-        <input list="phones" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="w-72 py-2.5 my-5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300 outline-none">
-        <!-- Datalist options for the input field -->
-        <datalist id="phones">
-            <option value="Google Pixel Fold">
-            <option value="Apple iPhone 16e">
-            <option value="Samsung S25 Ultra">
-            <option value="OnePlus 13">
-            <option value="OnePlus 13R">
-            <option value="Google Pixel 9">
-            <option value="Google Pixel 9 Pro">
-            <option value="Samsung Galaxy S24 Ultra">
-            <option value="Apple iPhone 16">
-            <option value="Apple iPhone 16 Pro">
-            <option value="Nothing Phone 2a">
-            <option value="Nothing Phone 2a Plus">
-        </datalist>
+        <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="w-72 py-2.5 my-5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300">
         <!-- Hidden elements for phone name and feedback -->
         <p id="phonename" class="hidden">Phone Name</p>
         <p id="feedback" class="text-gray hidden invalid-choice"></p>
         <p id="emptyFeedback" class="text-gray hidden empty-input">Input cannot be empty.</p>
         <!-- Buttons for reveal and reset actions -->
-        <button id="revealButton" onclick="revealphone()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white hover:bg-gray-800">Reveal Phone</button>
-        <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white hover:bg-gray-800 hidden">Guess Again</button>
+        <button id="revealButton" onclick="revealphone()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Reveal</button>
+        <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Guess Again</button>
     </div>
     <script>
         // Function to initialize the game
@@ -183,6 +177,36 @@
             } else if (event.key === "8") {
                 playSound('../assets/sounds/invalid.wav');
             }
+        });
+
+        // Autocomplete functionality for the input field
+        document.addEventListener("DOMContentLoaded", function() {
+            const input = document.getElementById("guessInput");
+            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13", "OnePlus 13R", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro", "Nothing Phone 2a", "Nothing Phone 2a Plus"];
+
+            input.addEventListener("input", function(e) {
+                const value = e.target.value.toLowerCase();
+                const match = phones.find(phone => phone.toLowerCase().startsWith(value));
+                if (match) {
+                    const remaining = match.substring(value.length);
+                    input.value = value;
+                    input.setAttribute("data-autocomplete", remaining);
+                    input.classList.add("autocomplete-highlight");
+                } else {
+                    input.removeAttribute("data-autocomplete");
+                    input.classList.remove("autocomplete-highlight");
+                }
+            });
+
+            input.addEventListener("keydown", function(e) {
+                if (e.key === "Tab" && input.classList.contains("autocomplete-highlight")) {
+                    e.preventDefault();
+                    const remaining = input.getAttribute("data-autocomplete");
+                    input.value += remaining;
+                    input.removeAttribute("data-autocomplete");
+                    input.classList.remove("autocomplete-highlight");
+                }
+            });
         });
     </script>
 </body>
