@@ -100,6 +100,16 @@
                 console.error("Error playing sound: ", err);
             });
         }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "1") {
+                playSound('../assets/sounds/tip1.wav');
+            } else if (event.key === "2") {
+                playSound('../assets/sounds/tip2.wav');
+            } else if (event.key === "3") {
+                playSound('../assets/sounds/tip3.wav');
+            }
+        });
     </script>
 </body>
 </html>
