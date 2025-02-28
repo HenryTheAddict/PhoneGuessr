@@ -20,15 +20,23 @@
         }
         #guessInput {
             position: relative;
+            font-family: inherit;
+            background: transparent;
+        }
+        #autocompleteWrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
         }
         #autocompletePlaceholder {
             position: absolute;
             top: 50%;
-            left: 10px;
+            left: 8px;
             transform: translateY(-50%);
             color: #ccc;
             pointer-events: none;
             font-size: 1rem;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -37,9 +45,9 @@
         <!-- Container for phone specifications -->
         <div id="phonespecs" class="flex justify-center gap-2.5"></div>
         <!-- Input field for guessing the phone -->
-        <div class="relative w-72 mx-auto my-5">
+        <div id="autocompleteWrapper" class="relative w-72 mx-auto my-5">
             <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="w-full py-2.5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300">
-            <div id="autocompletePlaceholder" class="hidden"></div>
+            <div id="autocompletePlaceholder"></div>
         </div>
         <!-- Hidden elements for phone name and feedback -->
         <p id="phonename" class="hidden">Phone Name</p>
@@ -99,12 +107,11 @@
             document.getElementById("guessAgainButton").style.display = "none";
             document.getElementById("guessInput").value = ""; // Clear the input text
             document.getElementById("autocompletePlaceholder").innerHTML = ""; // Clear the autocomplete placeholder
-            document.getElementById("autocompletePlaceholder").classList.add("hidden"); // Hide the autocomplete placeholder
         }
 
         // Function to reveal the phone name based on user's guess
         function revealphone() {
-            const guessInput = document.getElementById("guessInput").value;
+            const guessInput = document.getElementById("guessInput").value.trim().toLowerCase();
             const phoneNameElement = document.getElementById("phonename");
             const feedbackElement = document.getElementById("feedback");
             const emptyFeedbackElement = document.getElementById("emptyFeedback");
@@ -132,7 +139,7 @@
             }
 
             // Check if the guess is valid
-            const validChoices = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro", "Nothing Phone 2a", "Nothing Phone 2a Plus"];
+            const validChoices = ["google pixel fold", "apple iphone 16e", "samsung s25 ultra", "oneplus 13", "google pixel 9", "google pixel 9 pro", "samsung galaxy s24 ultra", "apple iphone 16", "apple iphone 16 pro", "nothing phone 2a", "nothing phone 2a plus"];
             if (!validChoices.includes(guessInput)) {
                 feedbackElement.innerHTML = "Please enter a valid choice.";
                 feedbackElement.style.display = "block";
@@ -142,7 +149,7 @@
             }
 
             // Check if the guess is correct
-            const phoneselection = phoneNameElement.innerHTML;
+            const phoneselection = phoneNameElement.innerHTML.toLowerCase();
             if (guessInput === phoneselection) {
                 feedbackElement.innerHTML = "You got it right!";
                 feedbackElement.style.color = "green";
@@ -187,10 +194,19 @@
 
             input.addEventListener("input", function(e) {
                 const value = e.target.value.toLowerCase();
+                if (value === "") {
+                    autocompletePlaceholder.innerHTML = "";
+                    autocompletePlaceholder.classList.add("hidden");
+                    return;
+                }
+
                 const match = phones.find(phone => phone.toLowerCase().startsWith(value));
                 if (match) {
                     const remaining = match.substring(value.length);
-                    autocompletePlaceholder.innerHTML = remaining;
+                    
+                    // Replace the typed text with spaces to maintain the correct position
+                    const whitespace = value.replace(/./g, '&nbsp;');
+                    autocompletePlaceholder.innerHTML = `<span style="visibility:hidden">${whitespace}</span>${remaining}`;
                     autocompletePlaceholder.classList.remove("hidden");
                 } else {
                     autocompletePlaceholder.innerHTML = "";
@@ -201,7 +217,7 @@
             input.addEventListener("keydown", function(e) {
                 if (e.key === "Tab" && autocompletePlaceholder.innerHTML !== "") {
                     e.preventDefault();
-                    input.value += autocompletePlaceholder.innerHTML;
+                    input.value = autocompletePlaceholder.innerText.trim();
                     autocompletePlaceholder.innerHTML = "";
                     autocompletePlaceholder.classList.add("hidden");
                 }
