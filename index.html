@@ -18,6 +18,18 @@
             content: attr(data-autocomplete);
             color: #ccc;
         }
+        #guessInput {
+            position: relative;
+        }
+        #autocompletePlaceholder {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            color: #ccc;
+            pointer-events: none;
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -25,7 +37,10 @@
         <!-- Container for phone specifications -->
         <div id="phonespecs" class="flex justify-center gap-2.5"></div>
         <!-- Input field for guessing the phone -->
-        <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="w-72 py-2.5 my-5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300 autocomplete-highlight">
+        <div class="relative w-72 mx-auto my-5">
+            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="w-full py-2.5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300">
+            <div id="autocompletePlaceholder" class="hidden"></div>
+        </div>
         <!-- Hidden elements for phone name and feedback -->
         <p id="phonename" class="hidden">Phone Name</p>
         <p id="feedback" class="text-gray-500 hidden invalid-choice"></p>
@@ -83,6 +98,8 @@
             document.getElementById("revealButton").style.display = "block";
             document.getElementById("guessAgainButton").style.display = "none";
             document.getElementById("guessInput").value = ""; // Clear the input text
+            document.getElementById("autocompletePlaceholder").innerHTML = ""; // Clear the autocomplete placeholder
+            document.getElementById("autocompletePlaceholder").classList.add("hidden"); // Hide the autocomplete placeholder
         }
 
         // Function to reveal the phone name based on user's guess
@@ -165,6 +182,7 @@
 
             // Autocomplete functionality for the input field
             const input = document.getElementById("guessInput");
+            const autocompletePlaceholder = document.getElementById("autocompletePlaceholder");
             const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13", "OnePlus 13R", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro", "Nothing Phone 2a", "Nothing Phone 2a Plus"];
 
             input.addEventListener("input", function(e) {
@@ -172,22 +190,20 @@
                 const match = phones.find(phone => phone.toLowerCase().startsWith(value));
                 if (match) {
                     const remaining = match.substring(value.length);
-                    input.value = value;
-                    input.setAttribute("data-autocomplete", remaining);
-                    input.classList.add("autocomplete-highlight");
+                    autocompletePlaceholder.innerHTML = remaining;
+                    autocompletePlaceholder.classList.remove("hidden");
                 } else {
-                    input.removeAttribute("data-autocomplete");
-                    input.classList.remove("autocomplete-highlight");
+                    autocompletePlaceholder.innerHTML = "";
+                    autocompletePlaceholder.classList.add("hidden");
                 }
             });
 
             input.addEventListener("keydown", function(e) {
-                if (e.key === "Tab" && input.classList.contains("autocomplete-highlight")) {
+                if (e.key === "Tab" && autocompletePlaceholder.innerHTML !== "") {
                     e.preventDefault();
-                    const remaining = input.getAttribute("data-autocomplete");
-                    input.value += remaining;
-                    input.removeAttribute("data-autocomplete");
-                    input.classList.remove("autocomplete-highlight");
+                    input.value += autocompletePlaceholder.innerHTML;
+                    autocompletePlaceholder.innerHTML = "";
+                    autocompletePlaceholder.classList.add("hidden");
                 }
             });
         });
