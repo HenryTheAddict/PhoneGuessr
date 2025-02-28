@@ -22,6 +22,9 @@
         .fade-in {
             opacity: 1 !important;
         }
+        #revealButton {
+            background-color: #C9ECC6;
+        }
     </style>
 </head>
 <body>
@@ -37,9 +40,10 @@
         <p id="phonename" style="display:none;">Phone Name</p>
         <p id="feedback" style="display:none;"></p>
         <button id="revealButton" onclick="revealphone()">Reveal Phone</button>
+        <button id="guessAgainButton" onclick="resetGame()" style="display:none;">Guess Again</button>
     </div>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        function initializeGame() {
             const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13"];
             const phonespecs = [
                 ["48MP camera", "12GB RAM", "4821 mAh", "Tensor G2", "7.6 inch screen"],
@@ -68,15 +72,20 @@
             }, 100);
 
             document.getElementById("phonename").innerHTML = phoneselection;
-        });
+            document.getElementById("phonename").style.display = "none";
+            document.getElementById("feedback").style.display = "none";
+            document.getElementById("revealButton").style.display = "block";
+            document.getElementById("guessAgainButton").style.display = "none";
+        }
 
         function revealphone() {
             const guessInput = document.getElementById("guessInput").value;
             const phoneNameElement = document.getElementById("phonename");
             const feedbackElement = document.getElementById("feedback");
-            const buttonElement = document.getElementById("revealButton");
+            const revealButtonElement = document.getElementById("revealButton");
+            const guessAgainButtonElement = document.getElementById("guessAgainButton");
 
-            if (!feedbackElement || !phoneNameElement || !buttonElement) {
+            if (!feedbackElement || !phoneNameElement || !revealButtonElement || !guessAgainButtonElement) {
                 console.error("One or more necessary elements not found.");
                 return;
             }
@@ -103,7 +112,7 @@
                 feedbackElement.classList.add("animate__animated", "animate__tada");
                 playSound('../assets/sounds/correct.wav');
             } else {
-                feedbackElement.innerHTML = "You got it wrong!";
+                feedbackElement.innerHTML = `You got it wrong! The correct phone is ${phoneselection}.`;
                 feedbackElement.style.color = "red";
                 feedbackElement.classList.add("animate__animated", "animate__headshake");
                 playSound('../assets/sounds/incorrect.wav');
@@ -112,7 +121,8 @@
             phoneNameElement.style.display = "block";
             phoneNameElement.classList.add("animate__animated", "animate__zoomIn");
             feedbackElement.style.display = "block";
-            buttonElement.style.display = "none";
+            revealButtonElement.style.display = "none";
+            guessAgainButtonElement.style.display = "block";
         }
 
         function playSound(filePath) {
@@ -121,6 +131,12 @@
                 console.error("Error playing sound: ", err);
             });
         }
+
+        function resetGame() {
+            initializeGame();
+        }
+
+        document.addEventListener("DOMContentLoaded", initializeGame);
 
         document.addEventListener("keydown", function(event) {
             if (event.key === "1") {
