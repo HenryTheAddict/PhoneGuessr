@@ -10,83 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <style>
-        /* Center align text */
-        .center {
-            text-align: center;
-        }
-        /* Initial styling for phone specifications */
-        .spec {
-            opacity: 0;
-            transition: opacity 1s;
-        }
-        /* Fade-in effect for phone specifications */
-        .fade-in {
-            opacity: 1 !important;
-        }
-        /* Button styling */
-        button {
-            background-color: #4A5568; /* bg-gray-700 */
-            border-radius: 15px;
-            margin: 10px auto; /* Center the button horizontally */
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-            display: block; /* Ensure the button is treated as a block element */
-            color: white;
-        }
-        /* Hover effect for buttons */
-        button:hover {
-            background-color: #2D3748; /* bg-gray-800 */
-        }
-        /* Styling for invalid choice feedback */
-        .invalid-choice {
-            color: grey;
-        }
-        /* Styling for empty input feedback */
-        .empty-input {
-            color: grey;
-            display: none;
-        }
-        /* Input field styling */
-        #guessInput {
-            width: 300px;
-            padding: 10px;
-            margin: 20px 0;
-            border: 2px solid #ddd;
-            border-radius: 25px;
-            font-size: 16px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        /* Focus effect for input field */
-        #guessInput:focus {
-            border-color: #C9ECC6;
-        }
-        /* Styling for datalist options */
-        datalist {
-            font-size: 16px;
-        }
-        /* Flex container for horizontal layout */
-        #phonespecs {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        /* Flex item for each specification */
-        .spec {
-            flex: 1;
-        }
-    </style>
 </head>
 <body class="bg-gray-900 text-white">
-    <div class="center mt-4"> <!-- Added mt-4 class here -->
+    <div class="text-center mt-4">
         <!-- Container for phone specifications -->
-        <div id="phonespecs"></div>
+        <div id="phonespecs" class="flex justify-center gap-2.5"></div>
         <!-- Input field for guessing the phone -->
-        <input list="phones" id="guessInput" name="phoneGuess" placeholder="Guess the phone...">
+        <input list="phones" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="w-72 py-2.5 my-5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300 outline-none">
         <!-- Datalist options for the input field -->
         <datalist id="phones">
             <option value="Google Pixel Fold">
@@ -103,17 +33,17 @@
             <option value="Nothing Phone 2a Plus">
         </datalist>
         <!-- Hidden elements for phone name and feedback -->
-        <p id="phonename" style="display:none;">Phone Name</p>
-        <p id="feedback" style="display:none;" class="invalid-choice"></p>
-        <p id="emptyFeedback" class="empty-input">Input cannot be empty.</p>
+        <p id="phonename" class="hidden">Phone Name</p>
+        <p id="feedback" class="text-gray hidden invalid-choice"></p>
+        <p id="emptyFeedback" class="text-gray hidden empty-input">Input cannot be empty.</p>
         <!-- Buttons for reveal and reset actions -->
-        <button id="revealButton" onclick="revealphone()">Reveal Phone</button>
-        <button id="guessAgainButton" onclick="resetGame()" style="display:none;">Guess Again</button>
+        <button id="revealButton" onclick="revealphone()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white hover:bg-gray-800">Reveal Phone</button>
+        <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white hover:bg-gray-800 hidden">Guess Again</button>
     </div>
     <script>
         // Function to initialize the game
         function initializeGame() {
-            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13","Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro", "OnePlus 13R", "Nothing Phone 2a", "Nothing Phone 2a Plus"];
+            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro", "Nothing Phone 2a", "Nothing Phone 2a Plus"];
             const phonespecs = [
                 ["48MP camera", "12GB RAM", "4821 mAh", "Tensor G2", "7.6 inch screen"],
                 ["48MP camera", "8GB RAM", "unknown", "A18 Bionic Chip", "6.1 inch screen"],
@@ -127,7 +57,6 @@
                 ["50MP camera", "12/16GB RAM", "6000mAh", "Snapdragon 8 Gen 3", "6.78 inch screen"],
                 ["50MP camera", "8/12GB RAM", "5000mAh", "Dimensity 7200 Pro", "6.7 inch screen"],
                 ["50MP camera", "8/12GB RAM", "5000mAh", "Dimensity 7350 Pro", "6.7 inch screen"]
-
             ];
 
             // Randomly select a phone and its specifications
@@ -141,15 +70,15 @@
             specselection.forEach((spec, index) => {
                 const specElement = document.createElement("p");
                 specElement.textContent = spec;
-                specElement.className = "spec";
+                specElement.className = "opacity-0 transition-opacity duration-1000";
                 specElement.style.transitionDelay = `${index * 0.5}s`;
                 specContainer.appendChild(specElement);
             });
 
             // Add fade-in class to specifications after a short delay
             setTimeout(() => {
-                const specElements = document.querySelectorAll(".spec");
-                specElements.forEach(element => element.classList.add("fade-in"));
+                const specElements = document.querySelectorAll(".opacity-0");
+                specElements.forEach(element => element.classList.add("opacity-100"));
             }, 100);
 
             // Hide and show the necessary elements
@@ -192,11 +121,11 @@
             }
 
             // Check if the guess is valid
-            const validChoices = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro", "OnePlus 13R", "Nothing Phone 2a", "Nothing Phone 2a Plus"];
+            const validChoices = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro", "Nothing Phone 2a", "Nothing Phone 2a Plus"];
             if (!validChoices.includes(guessInput)) {
                 feedbackElement.innerHTML = "Please enter a valid choice.";
                 feedbackElement.style.display = "block";
-                feedbackElement.classList.add("invalid-choice");
+                feedbackElement.classList.add("text-gray");
                 playSound('../assets/sounds/invalid.wav');
                 return;
             }
