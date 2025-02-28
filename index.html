@@ -25,11 +25,11 @@
         <!-- Container for phone specifications -->
         <div id="phonespecs" class="flex justify-center gap-2.5"></div>
         <!-- Input field for guessing the phone -->
-        <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="w-72 py-2.5 my-5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300">
+        <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="w-72 py-2.5 my-5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300 autocomplete-highlight">
         <!-- Hidden elements for phone name and feedback -->
         <p id="phonename" class="hidden">Phone Name</p>
-        <p id="feedback" class="text-gray hidden invalid-choice"></p>
-        <p id="emptyFeedback" class="text-gray hidden empty-input">Input cannot be empty.</p>
+        <p id="feedback" class="text-gray-500 hidden invalid-choice"></p>
+        <p id="emptyFeedback" class="text-gray-500 hidden empty-input">Input cannot be empty.</p>
         <!-- Buttons for reveal and reset actions -->
         <button id="revealButton" onclick="revealphone()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Reveal</button>
         <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Guess Again</button>
@@ -119,7 +119,7 @@
             if (!validChoices.includes(guessInput)) {
                 feedbackElement.innerHTML = "Please enter a valid choice.";
                 feedbackElement.style.display = "block";
-                feedbackElement.classList.add("text-gray");
+                feedbackElement.classList.add("text-gray-500");
                 playSound('../assets/sounds/invalid.wav');
                 return;
             }
@@ -159,28 +159,11 @@
             initializeGame();
         }
 
-        // Initialize the game when the document is fully loaded
-        document.addEventListener("DOMContentLoaded", initializeGame);
-
-        // Play sound effects based on key presses
-        document.addEventListener("keydown", function(event) {
-            if (event.key === "1") {
-                playSound('../assets/sounds/tip1.wav');
-            } else if (event.key === "2") {
-                playSound('../assets/sounds/tip2.wav');
-            } else if (event.key === "3") {
-                playSound('../assets/sounds/tip3.wav');
-            } else if (event.key === "0") {
-                playSound('../assets/sounds/correct.wav');
-            } else if (event.key === "9") {
-                playSound('../assets/sounds/incorrect.wav');
-            } else if (event.key === "8") {
-                playSound('../assets/sounds/invalid.wav');
-            }
-        });
-
-        // Autocomplete functionality for the input field
+        // Initialize the game and autocomplete functionality when the document is fully loaded
         document.addEventListener("DOMContentLoaded", function() {
+            initializeGame();
+
+            // Autocomplete functionality for the input field
             const input = document.getElementById("guessInput");
             const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13", "OnePlus 13R", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro", "Nothing Phone 2a", "Nothing Phone 2a Plus"];
 
@@ -207,6 +190,23 @@
                     input.classList.remove("autocomplete-highlight");
                 }
             });
+        });
+
+        // Play sound effects based on key presses
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "1") {
+                playSound('../assets/sounds/tip1.wav');
+            } else if (event.key === "2") {
+                playSound('../assets/sounds/tip2.wav');
+            } else if (event.key === "3") {
+                playSound('../assets/sounds/tip3.wav');
+            } else if (event.key === "0") {
+                playSound('../assets/sounds/correct.wav');
+            } else if (event.key === "9") {
+                playSound('../assets/sounds/incorrect.wav');
+            } else if (event.key === "8") {
+                playSound('../assets/sounds/invalid.wav');
+            }
         });
     </script>
 </body>
