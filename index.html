@@ -1,103 +1,70 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-    <title>Phone Guessr</title>
-    <link rel="icon" type="image/x-icon" href="../assets/logos/logo.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <style>
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13"];
+        const phonespecs = [
+            "48MP camera, 12GB RAM, 4821 mAh, Tensor G2 - 7.6 inch screen",
+            "48MP camera, 8GB RAM A18 Bionic Chip - 6.1 inch screen",
+            "200MP camera, 12/16gb ram - 5000mAh, Snapdragon 8 Elite - 6.9 inch screen",
+            "Oneplus 13 i will do this later lol 😂"
+        ];
+
+        const randomphone = Math.floor(Math.random() * phones.length);
+        const phoneselection = phones[randomphone];
+        const specselection = phonespecs[randomphone];
+
+        document.getElementById("phonespecs").innerHTML = specselection;
+        document.getElementById("phonename").innerHTML = phoneselection;
+    });
+
+    function revealphone() {
+        const guessInput = document.getElementById("guessInput").value;
+        const phoneNameElement = document.getElementById("phonename");
+        const feedbackElement = document.getElementById("feedback");
+        const buttonElement = document.getElementById("revealButton");
+
+        if (!feedbackElement || !phoneNameElement || !buttonElement) {
+            console.error("One or more necessary elements not found.");
+            return;
         }
-        .center {
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <div class="center">
-        <p id="phonespecs">Phone Specs</p>
-        <input list="phones" id="guessInput" name="phoneGuess" placeholder="Guess the phone...">
-        <datalist id="phones">
-            <option value="Google Pixel Fold">
-            <option value="Apple iPhone 16e">
-            <option value="Samsung S25 Ultra">
-            <option value="OnePlus 13">
-        </datalist>
-        <p id="phonename" style="display:none;">Phone Name</p>
-        <p id="feedback" style="display:none;"></p>
-        <button id="revealButton" onclick="revealphone()">Reveal Phone</button>
-    </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13"];
-            const phonespecs = [
-                "48MP camera, 12GB RAM, 4821 mAh, Tensor G2 - 7.6 inch screen",
-                "48MP camera, 8GB RAM A18 Bionic Chip - 6.1 inch screen",
-                "200MP camera, 12/16gb ram - 5000mAh, Snapdragon 8 Elite - 6.9 inch screen",
-                "Oneplus 13 i will do this later lol 😂"
-            ];
 
-            const randomphone = Math.floor(Math.random() * phones.length);
-            const phoneselection = phones[randomphone];
-            const specselection = phonespecs[randomphone];
-
-            document.getElementById("phonespecs").innerHTML = specselection;
-            document.getElementById("phonename").innerHTML = phoneselection;
-        });
-
-        function revealphone() {
-            const guessInput = document.getElementById("guessInput").value;
-            const phoneNameElement = document.getElementById("phonename");
-            const feedbackElement = document.getElementById("feedback");
-            const buttonElement = document.getElementById("revealButton");
-
-            if (!feedbackElement || !phoneNameElement || !buttonElement) {
-                console.error("One or more necessary elements not found.");
-                return;
-            }
-
-            if (guessInput === "") {
-                feedbackElement.innerHTML = "Input cannot be empty.";
-                feedbackElement.style.display = "block";
-                return;
-            }
-
-            const validChoices = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13"];
-            if (!validChoices.includes(guessInput)) {
-                feedbackElement.innerHTML = "Please enter a valid choice.";
-                feedbackElement.style.display = "block";
-                return;
-            }
-
-            const phoneselection = phoneNameElement.innerHTML;
-            if (guessInput === phoneselection) {
-                feedbackElement.innerHTML = "You got it right!";
-                feedbackElement.style.color = "green";
-                feedbackElement.classList.add("animate__animated", "animate__tada");
-                playSound('../assets/sounds/correct.wav');
-            } else {
-                feedbackElement.innerHTML = "You got it wrong!";
-                feedbackElement.style.color = "red";
-                feedbackElement.classList.add("animate__animated", "animate__headshake");
-                playSound('../assets/sounds/wrong.wav');
-            }
-
-            phoneNameElement.style.display = "block";
-            phoneNameElement.classList.add("animate__animated", "animate__zoomIn");
+        if (guessInput === "") {
+            feedbackElement.innerHTML = "Input cannot be empty.";
             feedbackElement.style.display = "block";
-            buttonElement.style.display = "none";
+            playSound('../assets/sounds/invalid.wav');
+            return;
         }
 
-        function playSound(filePath) {
-            const audio = new Audio(filePath);
-            audio.play().catch(err => {
-                console.error("Error playing sound: ", err);
-            });
+        const validChoices = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13"];
+        if (!validChoices.includes(guessInput)) {
+            feedbackElement.innerHTML = "Please enter a valid choice.";
+            feedbackElement.style.display = "block";
+            playSound('../assets/sounds/invalid.wav');
+            return;
         }
-    </script>
-</body>
-</html>
+
+        const phoneselection = phoneNameElement.innerHTML;
+        if (guessInput === phoneselection) {
+            feedbackElement.innerHTML = "You got it right!";
+            feedbackElement.style.color = "green";
+            feedbackElement.classList.add("animate__animated", "animate__tada");
+            playSound('../assets/sounds/correct.wav');
+        } else {
+            feedbackElement.innerHTML = "You got it wrong!";
+            feedbackElement.style.color = "red";
+            feedbackElement.classList.add("animate__animated", "animate__headshake");
+            playSound('../assets/sounds/incorrect.wav');
+        }
+
+        phoneNameElement.style.display = "block";
+        phoneNameElement.classList.add("animate__animated", "animate__zoomIn");
+        feedbackElement.style.display = "block";
+        buttonElement.style.display = "none";
+    }
+
+    function playSound(filePath) {
+        const audio = new Audio(filePath);
+        audio.play().catch(err => {
+            console.error("Error playing sound: ", err);
+        });
+    }
+</script>
