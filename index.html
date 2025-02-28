@@ -42,6 +42,10 @@
         .invalid-choice {
             color: grey;
         }
+        .empty-input {
+            color: grey;
+            display: none;
+        }
         #guessInput {
             width: 300px;
             padding: 10px;
@@ -67,28 +71,23 @@
         <datalist id="phones">
             <option value="Google Pixel Fold">
             <option value="Apple iPhone 16e">
-            <option value="Samsung Galaxy S25 Ultra">
+            <option value="Samsung S25 Ultra">
             <option value="OnePlus 13">
-            <option value="Apple iPhone 16">
-            <option value="Samsung Galaxy S24 Ultra">
-            <option value="Google Pixel 9">
         </datalist>
         <p id="phonename" style="display:none;">Phone Name</p>
         <p id="feedback" style="display:none;" class="invalid-choice"></p>
+        <p id="emptyFeedback" class="empty-input">Input cannot be empty.</p>
         <button id="revealButton" onclick="revealphone()">Reveal Phone</button>
         <button id="guessAgainButton" onclick="resetGame()" style="display:none;">Guess Again</button>
     </div>
     <script>
         function initializeGame() {
-            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung Galaxy S25 Ultra", "OnePlus 13", "Apple iPhone 16", "Samsung Galaxy S24 Ultra", "Google Pixel 9"];
+            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13"];
             const phonespecs = [
                 ["48MP camera", "12GB RAM", "4821 mAh", "Tensor G2", "7.6 inch screen"],
                 ["48MP camera", "8GB RAM", "unknown", "A18 Bionic Chip", "6.1 inch screen"],
                 ["200MP camera", "12/16GB RAM", "5000mAh", "Snapdragon 8 Elite", "6.9 inch screen"],
-                ["50MP camera", "12/24GB RAM", "6000mAh", "Snapdragon 8 Elite", "6.82 inch screen"],
-                ["48MP camera", "8GB RAM", "3561mAh", "A18 Bionic Chip", "6.1 inch screen"],
-                ["200MP camera", "12GB RAM", "5000mAh", "Snapdragon 8 Gen 3", "6.8 inch screen"],
-                ["50MP camera", "12GB RAM", "4700mAh", "Tensor G4", "6.3 inch screen"]
+                ["50MP camera", "12/24GB RAM", "6000mAh", "Snapdragon 8 Elite", "6.82 inch screen"]
             ];
 
             const randomphone = Math.floor(Math.random() * phones.length);
@@ -113,6 +112,7 @@
             document.getElementById("phonename").innerHTML = phoneselection;
             document.getElementById("phonename").style.display = "none";
             document.getElementById("feedback").style.display = "none";
+            document.getElementById("emptyFeedback").style.display = "none";
             document.getElementById("revealButton").style.display = "block";
             document.getElementById("guessAgainButton").style.display = "none";
             document.getElementById("guessInput").value = ""; // Clear the input text
@@ -122,18 +122,25 @@
             const guessInput = document.getElementById("guessInput").value;
             const phoneNameElement = document.getElementById("phonename");
             const feedbackElement = document.getElementById("feedback");
+            const emptyFeedbackElement = document.getElementById("emptyFeedback");
             const revealButtonElement = document.getElementById("revealButton");
             const guessAgainButtonElement = document.getElementById("guessAgainButton");
 
-            if (!feedbackElement || !phoneNameElement || !revealButtonElement || !guessAgainButtonElement) {
+            if (!feedbackElement || !phoneNameElement || !emptyFeedbackElement || !revealButtonElement || !guessAgainButtonElement) {
                 console.error("One or more necessary elements not found.");
                 return;
             }
 
             if (guessInput === "") {
-                feedbackElement.innerHTML = "Input cannot be empty.";
-                feedbackElement.style.display = "block";
+                emptyFeedbackElement.style.display = "block";
                 playSound('../assets/sounds/invalid.wav');
+                setTimeout(() => {
+                    emptyFeedbackElement.classList.add('animate__animated', 'animate__fadeOut');
+                }, 2000); // Delay before starting the fade-out
+                setTimeout(() => {
+                    emptyFeedbackElement.style.display = "none";
+                    emptyFeedbackElement.classList.remove('animate__animated', 'animate__fadeOut');
+                }, 4000); // Time after which the element will be hidden
                 return;
             }
 
