@@ -64,7 +64,7 @@
     <script>
         // Function to initialize the game
         function initializeGame() {
-            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung S25 Ultra", "OnePlus 13", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro", "Nothing Phone 2a", "Nothing Phone 2a Plus"];
+            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung Galaxy S25 Ultra", "OnePlus 13", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro", "Nothing Phone 2a", "Nothing Phone 2a Plus"];
             const phonespecs = [
                 ["48MP camera", "12GB RAM", "4821 mAh", "Tensor G2", "7.6 inch screen"],
                 ["48MP camera", "8GB RAM", "unknown", "A18 Bionic Chip", "6.1 inch screen"],
@@ -143,7 +143,7 @@
             }
 
             // Check if the guess is valid
-            const validChoices = ["google pixel fold", "apple iphone 16e", "samsung s25 ultra", "oneplus 13", "google pixel 9", "google pixel 9 pro", "samsung galaxy s24 ultra", "apple iphone 16", "apple iphone 16 pro", "nothing phone 2a", "nothing phone 2a plus"];
+            const validChoices = ["google pixel fold", "apple iphone 16e", "samsung galaxy s25 ultra", "oneplus 13", "google pixel 9", "google pixel 9 pro", "samsung galaxy s24 ultra", "apple iphone 16", "apple iphone 16 pro", "nothing phone 2a", "nothing phone 2a plus"];
             if (!validChoices.includes(guessInput)) {
                 feedbackElement.innerHTML = "Please enter a valid choice.";
                 feedbackElement.style.display = "block";
