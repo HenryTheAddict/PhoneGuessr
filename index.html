@@ -2,36 +2,27 @@
 <html>
 <head>
     <title>Phone Guessr</title>
-    <!-- Favicon for the page -->
     <link rel="icon" type="image/x-icon" href="../assets/logos/logo.png">
-    <!-- External CSS for animations -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS -->
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-gray-900 text-white">
     <div class="text-center mt-4">
-        <!-- Container for phone specifications -->
         <div id="phonespecs" class="flex justify-center gap-2.5"></div>
-        <!-- Input field for guessing the phone -->
         <div id="autocompleteWrapper" class="relative inline-block w-1/2">
-            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="w-full py-2.5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300 relative font-unbounded text-base bg-transparent placeholder-gray-500 after:content-[attr(data-autocomplete)] after:text-gray-300">
-            <div id="autocompletePlaceholder" class="hidden absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-300 pointer-events-none font-unbounded text-base whitespace-nowrap overflow-hidden text-ellipsis"></div>
+            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="w-full py-2.5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition">
+            <div id="autocompletePlaceholder" class="hidden absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-300 pointer-events-none font-unbounded text-base whitespace-nowrap overflow-ellipsis"></div>
         </div>
-        <!-- Hidden elements for phone name and feedback -->
         <p id="phonename" class="hidden">Phone Name</p>
         <p id="feedback" class="text-gray-500 hidden invalid-choice"></p>
         <p id="emptyFeedback" class="text-gray-500 hidden empty-input">Input cannot be empty.</p>
-        <!-- Buttons for reveal and reset actions -->
         <button id="revealButton" onclick="revealphone()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Reveal</button>
         <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Guess Again</button>
     </div>
     <script>
-        // Function to initialize the game
         function initializeGame() {
-            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung Galaxy S25 Ultra", "OnePlus 13", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro"];
+            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung Galaxy S25 Ultra", "OnePlus 13", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16"];
             const phonespecs = [
                 ["48MP camera", "12GB RAM", "4821 mAh", "Tensor G2", "7.6 inch screen"],
                 ["48MP camera", "8GB RAM", "unknown", "A18 Bionic Chip", "6.1 inch screen"],
@@ -40,11 +31,7 @@
                 ["50MP camera", "12GB RAM", "4700mAh", "Tensor G4", "6.3 inch screen"],
                 ["50MP camera", "16GB RAM", "4700mAh or 5060mah", "Tensor G4", "6.3 inch or 6.8 inch screen"],
                 ["200MP camera", "12GB RAM", "5000mAh", "Snapdragon 8 Gen 3", "6.8 inch screen"],
-                ["48MP camera", "8GB RAM", "3561mAh or 4674mAh", "A18 Bionic Chip", "6.1 inch or 6.7 inch screen"],
-                ["48MP camera", "8GB RAM", "3582mAh or 4685mAh", "A18 Pro Bionic Chip", "6.3 inch or 6.9 inch screen"],
-                ["50MP camera", "12/16GB RAM", "6000mAh", "Snapdragon 8 Gen 3", "6.78 inch screen"],
-                ["50MP camera", "8/12GB RAM", "5000mAh", "Dimensity 7200 Pro", "6.7 inch screen"],
-                ["50MP camera", "8/12GB RAM", "5000mAh", "Dimensity 7350 Pro", "6.7 inch screen"]
+                ["48MP camera", "8GB RAM", "3561mAh or 4674mAh", "A18 Bionic Chip", "6.1 inch or 6.7 inch screen"]
             ];
 
             // Randomly select a phone and its specifications
@@ -54,6 +41,10 @@
 
             // Display the specifications with a fade-in effect
             const specContainer = document.getElementById("phonespecs");
+            if (!specContainer) {
+                console.error("Element #phonespecs not found.");
+                return;
+            }
             specContainer.innerHTML = "";
             specselection.forEach((spec, index) => {
                 const specElement = document.createElement("p");
@@ -70,14 +61,27 @@
             }, 100);
 
             // Hide and show the necessary elements
-            document.getElementById("phonename").innerHTML = phoneselection;
-            document.getElementById("phonename").style.display = "none";
-            document.getElementById("feedback").style.display = "none";
-            document.getElementById("emptyFeedback").style.display = "none";
-            document.getElementById("revealButton").style.display = "block";
-            document.getElementById("guessAgainButton").style.display = "none";
-            document.getElementById("guessInput").value = ""; // Clear the input text
-            document.getElementById("autocompletePlaceholder").innerHTML = ""; // Clear the autocomplete placeholder
+            const phonenameElement = document.getElementById("phonename");
+            const feedbackElement = document.getElementById("feedback");
+            const emptyFeedbackElement = document.getElementById("emptyFeedback");
+            const revealButtonElement = document.getElementById("revealButton");
+            const guessAgainButtonElement = document.getElementById("guessAgainButton");
+            const guessInputElement = document.getElementById("guessInput");
+            const autocompletePlaceholderElement = document.getElementById("autocompletePlaceholder");
+
+            if (!phonenameElement || !feedbackElement || !emptyFeedbackElement || !revealButtonElement || !guessAgainButtonElement || !guessInputElement || !autocompletePlaceholderElement) {
+                console.error("One or more necessary elements not found.");
+                return;
+            }
+
+            phonenameElement.innerHTML = phoneselection;
+            phonenameElement.style.display = "none";
+            feedbackElement.style.display = "none";
+            emptyFeedbackElement.style.display = "none";
+            revealButtonElement.style.display = "block";
+            guessAgainButtonElement.style.display = "none";
+            guessInputElement.value = ""; // Clear the input text
+            autocompletePlaceholderElement.innerHTML = ""; // Clear the autocomplete placeholder
         }
 
         // Function to reveal the phone name based on user's guess
@@ -89,13 +93,11 @@
             const revealButtonElement = document.getElementById("revealButton");
             const guessAgainButtonElement = document.getElementById("guessAgainButton");
 
-            // Check if all necessary elements are found
             if (!feedbackElement || !phoneNameElement || !emptyFeedbackElement || !revealButtonElement || !guessAgainButtonElement) {
                 console.error("One or more necessary elements not found.");
                 return;
             }
 
-            // Handle empty input
             if (guessInput === "") {
                 emptyFeedbackElement.style.display = "block";
                 playSound('../assets/sounds/invalid.wav');
@@ -109,8 +111,7 @@
                 return;
             }
 
-            // Check if the guess is valid
-            const validChoices = ["google pixel fold", "apple iphone 16e", "samsung galaxy s25 ultra", "oneplus 13", "google pixel 9", "google pixel 9 pro", "samsung galaxy s24 ultra", "apple iphone 16", "apple iphone 16 pro"];
+            const validChoices = ["google pixel fold", "apple iphone 16e", "samsung galaxy s25 ultra", "oneplus 13", "google pixel 9", "google pixel 9 pro", "samsung galaxy s24 ultra", "apple iphone 16"];
             if (!validChoices.includes(guessInput)) {
                 feedbackElement.innerHTML = "Please enter a valid choice.";
                 feedbackElement.style.display = "block";
@@ -119,7 +120,6 @@
                 return;
             }
 
-            // Check if the guess is correct
             const phoneselection = phoneNameElement.innerHTML.toLowerCase();
             if (guessInput === phoneselection) {
                 feedbackElement.innerHTML = "You got it right!";
@@ -133,7 +133,6 @@
                 playSound('../assets/sounds/incorrect.wav');
             }
 
-            // Display the phone name and feedback, hide the reveal button, and show the guess again button
             phoneNameElement.style.display = "block";
             phoneNameElement.classList.add("animate__animated", "animate__zoomIn");
             feedbackElement.style.display = "block";
@@ -141,7 +140,6 @@
             guessAgainButtonElement.style.display = "block";
         }
 
-        // Function to play sound effects
         function playSound(filePath) {
             const audio = new Audio(filePath);
             audio.play().catch(err => {
@@ -149,19 +147,16 @@
             });
         }
 
-        // Function to reset the game
         function resetGame() {
             initializeGame();
         }
 
-        // Initialize the game and autocomplete functionality when the document is fully loaded
         document.addEventListener("DOMContentLoaded", function() {
             initializeGame();
 
-            // Autocomplete functionality for the input field
             const input = document.getElementById("guessInput");
             const autocompletePlaceholder = document.getElementById("autocompletePlaceholder");
-            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung Galaxy S25 Ultra", "OnePlus 13", "OnePlus 13R", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16", "Apple iPhone 16 Pro"];
+            const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung Galaxy S25 Ultra", "OnePlus 13", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16"];
 
             input.addEventListener("input", function(e) {
                 const value = e.target.value.toLowerCase();
@@ -174,8 +169,6 @@
                 const match = phones.find(phone => phone.toLowerCase().startsWith(value));
                 if (match) {
                     const remaining = match.substring(value.length);
-                    
-                    // Replace the typed text with spaces to maintain the correct position
                     autocompletePlaceholder.innerHTML = `<span style="visibility:hidden">${value}</span>${remaining}`;
                     autocompletePlaceholder.classList.remove("hidden");
                 } else {
@@ -197,7 +190,6 @@
             });
         });
 
-        // Play sound effects based on key presses
         document.addEventListener("keydown", function(event) {
             if (event.key === "1") {
                 playSound('../assets/sounds/tip1.wav');
