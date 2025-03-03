@@ -1,23 +1,26 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>PhoneGuessr📱</title>
+    <title>Phone Guessr</title>
     <link rel="icon" type="image/x-icon" href="../assets/logos/logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-gray-900 text-white">
+    <!-- Game Time Display -->
+    <div id="gameTime" class="text-center text-lg mt-4">Time Remaining: 2:00</div>
+
     <div class="text-center mt-4">
         <div id="phonespecs" class="mt-10 flex justify-center gap-2.5"></div>
         <div id="autocompleteWrapper" class="relative inline-block w-1/2">
-            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors">
+            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300">
             <div id="autocompletePlaceholder" class="hidden absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-300 pointer-events-none font-unbounded text-base whitespace-nowrap overflow-hidden"></div>
         </div>
         <p id="phonename" class="hidden">Phone Name</p>
         <p id="feedback" class="text-gray-500 hidden invalid-choice"></p>
         <p id="emptyFeedback" class="text-gray-500 hidden empty-input">Input cannot be empty.</p>
-        <button id="revealButton" onclick="revealphone()" class="mt-6 bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Reveal</button>
+        <button id="revealButton" onclick="revealphone()" class="mt-6 bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Reveal Phone</button>
         <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white hidden">Guess Again</button>
     </div>
     <script>
@@ -67,6 +70,10 @@
             const timer = setInterval(() => {
                 if (gametime > 0) {
                     gametime--;
+                    const minutes = Math.floor(gametime / 60);
+                    const seconds = gametime % 60;
+                    const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    document.getElementById('gameTime').textContent = `Time Remaining: ${formattedTime}`;
                     console.log('Game time left:', gametime);
                 } else {
                     clearInterval(timer);
