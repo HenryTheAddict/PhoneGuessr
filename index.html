@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Cool game where you have to guess the phone based off of specs.">
-    <title>PhoneGuessr📱</title>
+    <title>Phone Guessr</title>
     <link rel="icon" type="image/x-icon" href="../assets/logos/logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
         <p id="feedback" class="text-gray-500 hidden invalid-choice"></p>
         <p id="emptyFeedback" class="text-gray-500 hidden empty-input">Input cannot be empty.</p>
         <button id="revealButton" onclick="revealphone()" class="mt-6 bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Reveal</button>
-        <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white hidden">Guess Again</button>
+        <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Guess Again</button>
     </div>
 
     <script>
@@ -188,9 +188,17 @@
                     return;
                 }
 
-                const match = phones.find(phone => phone.toLowerCase().startsWith(value));
-                if (match) {
-                    const remaining = match.substring(value.length);
+                const matches = phones
+                    .map(phone => {
+                        const phoneLower = phone.toLowerCase();
+                        const distance = levenshteinDistance(value, phoneLower);
+                        return { phone, distance };
+                    })
+                    .sort((a, b) => a.distance - b.distance);
+
+                if (matches.length > 0) {
+                    const bestMatch = matches[0].phone;
+                    const remaining = bestMatch.substring(value.length);
                     autocompletePlaceholder.innerHTML = `<span style="visibility:hidden">${value}</span>${remaining}`;
                     autocompletePlaceholder.classList.remove("hidden");
                 } else {
@@ -200,16 +208,52 @@
             });
 
             input.addEventListener("keydown", function(e) {
-                if (e.key === "Tab" && !autocompletePlaceholder.classList.contains("hidden")) {
+                if (e.key === "Tab") {
                     e.preventDefault();
-                    const match = phones.find(phone => phone.toLowerCase().startsWith(input.value.toLowerCase()));
-                    if (match) {
-                        input.value = match;
+                    
+                    const value = input.value.toLowerCase();
+                    const matches = phones
+                        .map(phone => {
+                            const phoneLower = phone.toLowerCase();
+                            const distance = levenshteinDistance(value, phoneLower);
+                            return { phone, distance };
+                        })
+                        .sort((a, b) => a.distance - b.distance);
+
+                    if (matches.length > 0) {
+                        input.value = matches[0].phone;
                         autocompletePlaceholder.innerHTML = "";
                         autocompletePlaceholder.classList.add("hidden");
                     }
                 }
             });
+
+            function levenshteinDistance(a, b) {
+                const matrix = [];
+
+                for (let i = 0; i <= b.length; i++) {
+                    matrix[i] = [i];
+                }
+
+                for (let j = 0; j <= a.length; j++) {
+                    matrix[0][j] = j;
+                }
+
+                for (let i = 1; i <= b.length; i++) {
+                    for (let j = 1; j <= a.length; j++) {
+                        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                            matrix[i][j] = matrix[i - 1][j - 1];
+                        } else {
+                            matrix[i][j] = Math.min(
+                                matrix[i - 1][j - 1] + 1,
+                                Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
+                            );
+                        }
+                    }
+                }
+
+                return matrix[b.length][a.length];
+            }
         });
 
         document.addEventListener("keydown", function(event) {
