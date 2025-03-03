@@ -11,14 +11,14 @@
     <div class="text-center mt-4">
         <div id="phonespecs" class="mt-10 flex justify-center gap-2.5"></div>
         <div id="autocompleteWrapper" class="relative inline-block w-1/2">
-            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition">
-            <div id="autocompletePlaceholder" class="hidden absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-300 pointer-events-none font-unbounded text-base whitespace-nowrap overflow-ellipsis"></div>
+            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors">
+            <div id="autocompletePlaceholder" class="hidden absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-300 pointer-events-none font-unbounded text-base whitespace-nowrap overflow-hidden"></div>
         </div>
         <p id="phonename" class="hidden">Phone Name</p>
         <p id="feedback" class="text-gray-500 hidden invalid-choice"></p>
         <p id="emptyFeedback" class="text-gray-500 hidden empty-input">Input cannot be empty.</p>
         <button id="revealButton" onclick="revealphone()" class="mt-6 bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Reveal</button>
-        <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Guess Again</button>
+        <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white hidden">Guess Again</button>
     </div>
     <script>
         function initializeGame() {
@@ -36,14 +36,8 @@
 
             // Randomly select a phone and its specifications
             const startinggametime = 120;
-            var gametime = startinggametime;
-            while (gametime != null) {
-                sleep(1000);
-                gametime = gametime - 1;
-            var realgametime = 0;
-            while (startinggametime != null) {
-                var realgametime = gametime / 60
-            }
+            let gametime = startinggametime;
+
             const randomphone = Math.floor(Math.random() * phones.length);
             const phoneselection = phones[randomphone];
             const specselection = phonespecs[randomphone];
@@ -69,6 +63,17 @@
                 specElements.forEach(element => element.classList.add("opacity-100"));
             }, 100);
 
+            // Update the game time every second
+            const timer = setInterval(() => {
+                if (gametime > 0) {
+                    gametime--;
+                    console.log('Game time left:', gametime);
+                } else {
+                    clearInterval(timer);
+                    console.log('Game over');
+                }
+            }, 1000);
+
             // Hide and show the necessary elements
             const phonenameElement = document.getElementById("phonename");
             const feedbackElement = document.getElementById("feedback");
@@ -93,7 +98,6 @@
             autocompletePlaceholderElement.innerHTML = ""; // Clear the autocomplete placeholder
         }
 
-        // Function to reveal the phone name based on user's guess
         function revealphone() {
             const guessInput = document.getElementById("guessInput").value.trim().toLowerCase();
             const phoneNameElement = document.getElementById("phonename");
