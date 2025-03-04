@@ -10,6 +10,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .bg-gray-900 {
+            background-color: #121212;
+        }
+        .text-white {
+            color: #ffffff;
+        }
+        .text-gray-300 {
+            color: #b3b3b3;
+        }
+        .text-gray-500 {
+            color: #7a7a7a;
+        }
+        .bg-gray-700 {
+            background-color: #333333;
+        }
+        .border-gray-300 {
+            border-color: #b3b3b3;
+        }
+        .focus\:border-green-200:focus {
+            border-color: #81c784;
+        }
+        .bg-gray-800 {
+            background-color: #424242;
+        }
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+        }
+        .spec-text {
+            color: #ffffff;
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-white">
     <!-- Game Time Display -->
@@ -20,13 +56,13 @@
             <!-- Specifications will be inserted here -->
         </div>
         <div id="autocompleteWrapper" class="relative inline-block w-1/2">
-            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300">
+            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg focus:border-green-200 transition-colors duration-300 ease-in-out">
             <div id="autocompletePlaceholder" class="hidden absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-300 pointer-events-none font-unbounded text-base whitespace-nowrap overflow-hidden"></div>
         </div>
         <p id="phonename" class="hidden">Phone Name</p>
         <p id="feedback" class="text-gray-500 hidden invalid-choice"></p>
         <p id="emptyFeedback" class="text-gray-500 hidden empty-input">Input cannot be empty.</p>
-        <button id="revealButton" onclick="revealphone()" class="mt-6 bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Reveal</button>
+        <button id="revealButton" onclick="revealphone()" class="mt-6 bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Reveal Phone</button>
         <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Guess Again</button>
     </div>
 
@@ -60,7 +96,7 @@
             specselection.forEach((spec, index) => {
                 const specElement = document.createElement("p");
                 specElement.textContent = spec;
-                specElement.className = "opacity-0 transition-opacity duration-1000 bg-gray-800 p-4 rounded-lg shadow-lg";
+                specElement.className = "opacity-0 transition-opacity duration-1000 bg-gray-800 p-4 rounded-lg shadow-lg spec-text";
                 specElement.style.transitionDelay = `${index * 0.5}s`;
                 specContainer.appendChild(specElement);
             });
