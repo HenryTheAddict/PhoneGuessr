@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
-<body class="bg-gray-900 text-white">
+<body>
     <!-- Game Time Display -->
     <div id="gameTime" class="text-center text-lg mt-4">Time Remaining: 2:00</div>
 
@@ -20,14 +20,14 @@
             <!-- Specifications will be inserted here -->
         </div>
         <div id="autocompleteWrapper" class="relative inline-block w-1/2">
-            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg transition-colors duration-300 ease-in-out">
-            <div id="autocompletePlaceholder" class="hidden absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-300 pointer-events-none font-unbounded text-base whitespace-nowrap overflow-hidden"></div>
+            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg transition-colors duration-300">
+            <div id="autocompletePlaceholder" class="hidden absolute top-1/2 left-2 transform -translate-y-1/2 pointer-events-none font-unbounded text-base whitespace-nowrap overflow-hidden"></div>
         </div>
         <p id="phonename" class="hidden">Phone Name</p>
-        <p id="feedback" class="text-gray-500 hidden invalid-choice"></p>
-        <p id="emptyFeedback" class="text-gray-500 hidden empty-input">Input cannot be empty.</p>
-        <button id="revealButton" onclick="revealphone()" class="mt-6 bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Reveal Phone</button>
-        <button id="guessAgainButton" onclick="resetGame()" class="bg-gray-700 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block text-white">Guess Again</button>
+        <p id="feedback" class="hidden invalid-choice"></p>
+        <p id="emptyFeedback" class="hidden empty-input">Input cannot be empty.</p>
+        <button id="revealButton" onclick="revealphone()" class="mt-6 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block">Reveal</button>
+        <button id="guessAgainButton" onclick="resetGame()" class="rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block">Guess Again</button>
     </div>
 
     <script>
@@ -60,7 +60,7 @@
             specselection.forEach((spec, index) => {
                 const specElement = document.createElement("p");
                 specElement.textContent = spec;
-                specElement.className = "opacity-0 transition-opacity duration-1000 bg-gray-800 p-4 rounded-lg shadow-lg spec-text";
+                specElement.className = "opacity-0 transition-opacity duration-1000 p-4 rounded-lg shadow-lg spec-text";
                 specElement.style.transitionDelay = `${index * 0.5}s`;
                 specContainer.appendChild(specElement);
             });
@@ -138,7 +138,6 @@
             if (!validChoices.includes(guessInput)) {
                 feedbackElement.innerHTML = "Please enter a valid choice.";
                 feedbackElement.style.display = "block";
-                feedbackElement.classList.add("text-gray-500");
                 playSound('../assets/sounds/invalid.wav');
                 return;
             }
@@ -146,18 +145,13 @@
             const phoneselection = phoneNameElement.innerHTML.toLowerCase();
             if (guessInput === phoneselection) {
                 feedbackElement.innerHTML = "You got it right!";
-                feedbackElement.style.color = "green";
-                feedbackElement.classList.add("animate__animated", "animate__tada");
                 playSound('../assets/sounds/correct.wav');
             } else {
                 feedbackElement.innerHTML = "Incorrect.";
-                feedbackElement.style.color = "red";
-                feedbackElement.classList.add("animate__animated", "animate__headShake");
                 playSound('../assets/sounds/incorrect.wav');
             }
 
             phoneNameElement.style.display = "block";
-            phoneNameElement.classList.add("animate__animated", "animate__zoomIn");
             feedbackElement.style.display = "block";
             revealButtonElement.style.display = "none";
             guessAgainButtonElement.style.display = "block";
@@ -210,7 +204,7 @@
             input.addEventListener("keydown", function(e) {
                 if (e.key === "Tab") {
                     e.preventDefault();
-                    
+
                     const value = input.value.toLowerCase();
                     const matches = phones
                         .map(phone => {
