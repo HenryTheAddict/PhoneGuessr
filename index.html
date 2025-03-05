@@ -12,22 +12,24 @@
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-gray-900 text-white">
-    <div id="gameTime" class="text-center text-lg mt-4">Time Remaining: 2:00</div>
-
-    <div class="text-center mt-4">
-        <div id="phonespecs" class="mt-10 flex justify-center gap-2.5 flex-wrap">
+    <header>
+        <div id="gameTime" class="text-center text-lg mt-4" aria-live="polite">Time Remaining: 2:00</div>
+    </header>
+    <main>
+        <div class="text-center mt-4">
+            <div id="phonespecs" class="mt-10 flex justify-center gap-2.5 flex-wrap" aria-live="polite">
+            </div>
+            <div id="autocompleteWrapper" class="relative inline-block w-1/2">
+                <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg transition-colors duration-300" aria-autocomplete="list" aria-controls="autocompletePlaceholder" aria-expanded="false">
+                <div id="autocompletePlaceholder" class="hidden absolute top-1/2 left-2 transform -translate-y-1/2 pointer-events-none font-unbounded text-base whitespace-nowrap overflow-hidden text-gray-500"></div>
+            </div>
+            <p id="phonename" class="hidden" aria-live="polite">Phone Name</p>
+            <p id="feedback" class="hidden invalid-choice text-red-500" aria-live="assertive"></p>
+            <p id="emptyFeedback" class="hidden empty-input text-red-500" aria-live="assertive">Input cannot be empty.</p>
+            <button id="revealButton" onclick="revealphone()" class="mt-6 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white" aria-label="Reveal Phone">Reveal</button>
+            <button id="guessAgainButton" onclick="resetGame()" class="rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white" aria-label="Guess Again">Guess Again</button>
         </div>
-        <div id="autocompleteWrapper" class="relative inline-block w-1/2">
-            <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg transition-colors duration-300 bg-gray-800 text-white">
-            <div id="autocompletePlaceholder" class="hidden absolute top-1/2 left-2 transform -translate-y-1/2 pointer-events-none font-unbounded text-base whitespace-nowrap overflow-hidden text-gray-500"></div>
-        </div>
-        <p id="phonename" class="hidden">Phone Name</p>
-        <p id="feedback" class="hidden invalid-choice text-red-500"></p>
-        <p id="emptyFeedback" class="hidden empty-input text-red-500">Input cannot be empty.</p>
-        <button id="revealButton" onclick="revealphone()" class="mt-6 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white">Reveal</button>
-        <button id="guessAgainButton" onclick="resetGame()" class="rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white">Guess Again</button>
-    </div>
-
+    </main>
     <script>
         const phones = ["Google Pixel Fold", "Apple iPhone 16e", "Samsung Galaxy S25 Ultra", "OnePlus 13", "Google Pixel 9", "Google Pixel 9 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 16"];
         const phonespecs = [
@@ -44,11 +46,9 @@
         function initializeGame() {
             const startinggametime = 120;
             let gametime = startinggametime;
-
             const randomphone = Math.floor(Math.random() * phones.length);
             const phoneselection = phones[randomphone];
             const specselection = phonespecs[randomphone];
-
             const specContainer = document.getElementById("phonespecs");
             if (!specContainer) {
                 console.error("Element #phonespecs not found.");
@@ -62,7 +62,6 @@
                 specElement.style.transitionDelay = `${index * 0.5}s`;
                 specContainer.appendChild(specElement);
             });
-
             setTimeout(() => {
                 const specElements = document.querySelectorAll(".opacity-0");
                 specElements.forEach(element => element.classList.add("opacity-100"));
