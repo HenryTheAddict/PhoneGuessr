@@ -20,6 +20,7 @@
         .spec-text {
             background-color: #f0f0f0;
             color: black;
+            transition: box-shadow 0.2s;
         }
 
         .border-gray-300 {
@@ -75,8 +76,8 @@
             <p id="phonename" class="hidden" aria-live="polite">Phone Name</p>
             <p id="feedback" class="hidden invalid-choice text-red-500" aria-live="assertive"></p>
             <p id="emptyFeedback" class="hidden empty-input text-red-500" aria-live="assertive">Input cannot be empty.</p>
-            <button id="revealButton" onclick="revealphone()" class="mt-6 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white">Reveal</button>
-            <button id="guessAgainButton" onclick="resetGame()" class="rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white hidden">Guess Again</button>
+            <button id="revealButton" onclick="revealphone()" class="mt-6 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white">Reveal Phone</button>
+            <button id="guessAgainButton" onclick="resetGame()" class="rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white" style="display:none;">Guess Again</button>
         </div>
     </main>
     <script>
@@ -310,6 +311,19 @@
             } else if (event.key === "8") {
                 playSound('../assets/sounds/invalid.wav');
             }
+        });
+
+        // Add mouse move event listener to update shadows
+        document.addEventListener("mousemove", function(event) {
+            const { clientX, clientY } = event;
+            const { innerWidth, innerHeight } = window;
+            const xOffset = (clientX - innerWidth / 2) / innerWidth * 20;
+            const yOffset = (clientY - innerHeight / 2) / innerHeight * 20;
+
+            const elements = document.querySelectorAll(".spec-text");
+            elements.forEach(element => {
+                element.style.boxShadow = `${xOffset}px ${yOffset}px 15px rgba(0, 0, 0, 0.3)`;
+            });
         });
     </script>
 </body>
