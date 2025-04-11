@@ -13,21 +13,21 @@
 </head>
 <body class="dark:bg-gray-900 dark:text-white">
     <header>
-        <div id="gameTime" class="text-center text-lg mt-4" aria-live="polite">Time Remaining: 2:00</div>
+        <!-- Timer removed -->
     </header>
     <main>
         <div class="text-center mt-4">
             <div id="phonespecs" class="mt-10 flex justify-center gap-2.5 flex-wrap" aria-live="polite">
             </div>
             <div id="autocompleteWrapper" class="relative inline-block w-1/2">
-                <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg transition-colors duration-300" aria-autocomplete="list" aria-controls="autocompletePlaceholder" aria-expanded="false">
+                <input type="text" id="guessInput" name="phoneGuess" placeholder="Guess the phone..." class="mt-6 w-full py-2.5 border-2 border-gray-300 rounded-full text-lg transition-colors duration-300" />
                 <div id="autocompletePlaceholder" class="hidden absolute top-1/2 left-2 transform -translate-y-1/2 pointer-events-none font-unbounded text-base whitespace-nowrap overflow-hidden text-gray-500"></div>
             </div>
             <p id="phonename" class="hidden" aria-live="polite">Phone Name</p>
-            <p id="feedback" class="hidden invalid-choice text-red-500" aria-live="assertive"></p>
+            <p id="feedback" class="hidden text-red-500" aria-live="assertive"></p>
             <p id="emptyFeedback" class="hidden empty-input text-red-500" aria-live="assertive">Input cannot be empty.</p>
-            <button id="revealButton" onclick="revealphone()" class="mt-6 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white" aria-label="Reveal Phone">Reveal</button>
-            <button id="guessAgainButton" onclick="resetGame()" class="rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white" aria-label="Guess Again">Guess Again</button>
+            <button id="revealButton" onclick="revealphone()" class="mt-6 rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white">Reveal</button>
+            <button id="guessAgainButton" onclick="resetGame()" class="rounded-xl my-2.5 mx-auto py-2.5 px-5 border-none cursor-pointer text-lg transition-colors duration-300 block bg-blue-700 text-white">Guess Again</button>
         </div>
     </main>
     <script>
@@ -44,8 +44,6 @@
         ];
 
         function initializeGame() {
-            const startinggametime = 120;
-            let gametime = startinggametime;
             const randomphone = Math.floor(Math.random() * phones.length);
             const phoneselection = phones[randomphone];
             const specselection = phonespecs[randomphone];
@@ -66,21 +64,6 @@
                 const specElements = document.querySelectorAll(".opacity-0");
                 specElements.forEach(element => element.classList.add("opacity-100"));
             }, 100);
-
-            const timer = setInterval(() => {
-                if (gametime > 0) {
-                    gametime--;
-                    const minutes = Math.floor(gametime / 60);
-                    const seconds = gametime % 60;
-                    const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                    document.getElementById('gameTime').textContent = `Time Remaining: ${formattedTime}`;
-                    console.log('Game time left:', gametime);
-                } else {
-                    clearInterval(timer);
-                    document.getElementById('gameTime').textContent = "Time's up!";
-                    console.log('Game over');
-                }
-            }, 1000);
 
             const phonenameElement = document.getElementById("phonename");
             const feedbackElement = document.getElementById("feedback");
@@ -142,9 +125,11 @@
             const phoneselection = phoneNameElement.innerHTML.toLowerCase();
             if (guessInput === phoneselection) {
                 feedbackElement.innerHTML = "You got it right!";
+                feedbackElement.style.color = "green"; // Feedback is green for correct
                 playSound('../assets/sounds/correct.wav');
             } else {
                 feedbackElement.innerHTML = "Incorrect.";
+                feedbackElement.style.color = "red"; // Feedback is red for incorrect
                 playSound('../assets/sounds/incorrect.wav');
             }
 
@@ -167,100 +152,6 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             initializeGame();
-
-            const input = document.getElementById("guessInput");
-            const autocompletePlaceholder = document.getElementById("autocompletePlaceholder");
-
-            input.addEventListener("input", function(e) {
-                const value = e.target.value.toLowerCase();
-                if (value === "") {
-                    autocompletePlaceholder.innerHTML = "";
-                    autocompletePlaceholder.classList.add("hidden");
-                    return;
-                }
-
-                const matches = phones
-                    .map(phone => {
-                        const phoneLower = phone.toLowerCase();
-                        const distance = levenshteinDistance(value, phoneLower);
-                        return { phone, distance };
-                    })
-                    .sort((a, b) => a.distance - b.distance);
-
-                if (matches.length > 0) {
-                    const bestMatch = matches[0].phone;
-                    const remaining = bestMatch.substring(value.length);
-                    autocompletePlaceholder.innerHTML = `<span style="visibility:hidden">${value}</span>${remaining}`;
-                    autocompletePlaceholder.classList.remove("hidden");
-                } else {
-                    autocompletePlaceholder.innerHTML = "";
-                    autocompletePlaceholder.classList.add("hidden");
-                }
-            });
-
-            input.addEventListener("keydown", function(e) {
-                if (e.key === "Tab") {
-                    e.preventDefault();
-
-                    const value = input.value.toLowerCase();
-                    const matches = phones
-                        .map(phone => {
-                            const phoneLower = phone.toLowerCase();
-                            const distance = levenshteinDistance(value, phoneLower);
-                            return { phone, distance };
-                        })
-                        .sort((a, b) => a.distance - b.distance);
-
-                    if (matches.length > 0) {
-                        input.value = matches[0].phone;
-                        autocompletePlaceholder.innerHTML = "";
-                        autocompletePlaceholder.classList.add("hidden");
-                    }
-                }
-            });
-
-            function levenshteinDistance(a, b) {
-                const matrix = [];
-
-                for (let i = 0; i <= b.length; i++) {
-                    matrix[i] = [i];
-                }
-
-                for (let j = 0; j <= a.length; j++) {
-                    matrix[0][j] = j;
-                }
-
-                for (let i = 1; i <= b.length; i++) {
-                    for (let j = 1; j <= a.length; j++) {
-                        if (b.charAt(i - 1) === a.charAt(j - 1)) {
-                            matrix[i][j] = matrix[i - 1][j - 1];
-                        } else {
-                            matrix[i][j] = Math.min(
-                                matrix[i - 1][j - 1] + 1,
-                                Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
-                            );
-                        }
-                    }
-                }
-
-                return matrix[b.length][a.length];
-            }
-        });
-
-        document.addEventListener("keydown", function(event) {
-            if (event.key === "1") {
-                playSound('../assets/sounds/tip1.wav');
-            } else if (event.key === "2") {
-                playSound('../assets/sounds/tip2.wav');
-            } else if (event.key === "3") {
-                playSound('../assets/sounds/tip3.wav');
-            } else if (event.key === "0") {
-                playSound('../assets/sounds/correct.wav');
-            } else if (event.key === "9") {
-                playSound('../assets/sounds/incorrect.wav');
-            } else if (event.key === "8") {
-                playSound('../assets/sounds/invalid.wav');
-            }
         });
     </script>
 </body>
