@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calisto's Crusty Crusade: MEGA MIX</title>
+    <style>
+        :root {
+            --green: #88cc00; --dark-green: #558800;
+            --bg: #4a1c40; --gold: #ffbd00; --red: #ff4444;
+            --skin: #f0d0b0; --blue: #4fc3f7;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            margin: 0; background-color: var(--bg);
+            font-family: 'Arial Black', sans-serif;
+            overflow: hidden; touch-action: none; user-select: none;
+            height: 100vh; width: 100vw; display: flex; flex-direction: column;
+            color: white;
+        }
+
+        /* --- HUD --- */
+        #hud {
+            height: 70px; display: flex; justify-content: space-between;
+            align-items: center; padding: 0 20px; background: rgba(0,0,0,0.3);
+            border-bottom: 4px solid var(--gold); z-index: 10;
+        }
+        .stat-val { font-size: 28px; color: var(--gold); text-shadow: 2px 2px 0 #000; }
+        #lives { display: flex; gap: 5px; }
+        .life { width: 20px; height: 20px; background: #fff; border-radius: 4px; }
+        .life.lost { opacity: 0.2; background: #000; }
+
+        /* --- STAGE --- */
+        #stage { flex: 1; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        
+        /* --- TIMER --- */
+        #timer-wrap { height: 25px; background: #222; width: 100%; border-top: 2px solid white; }
+        #timer { height: 100%; background: var(--red); width: 100%; transform-origin: left; }
+
+        /* --- OVERLAYS --- */
+        .overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; justify-content: center; align-items: center;
+            flex-direction: column; z-index: 100; pointer-events: none;
+        }
+        .menu { background: var(--bg); pointer-events: auto; text-align: center; z-index: 200; }
+        .hidden { display: none !important; }
+
+        /* --- TEXT POPUPS --- */
+        #cmd-text {
+            font-size: 60px; color: var(--gold); text-shadow: 4px 4px 0 #000;
+            transform: rotate(-5deg); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes pop { from { transform: scale(0) rotate(-10deg); } to { transform: scale(1) rotate(-5deg); } }
+
+        #flash { background: white; opacity: 0; transition: opacity 0.1s; pointer-events: none; }
+
+        /* --- CALISTO --- */
+        #calisto {
+            position: absolute; top: 80px; left: 10px; font-size: 70px; z-index: 5;
+            filter: drop-shadow(2px 2px 0 #000); transition: transform 0.2s;
+        }
+
+        /* --- GENERIC GAME OBJECTS --- */
+        .obj { position: absolute; display: flex; justify-content: center; align-items: center; font-size: 40px; user-select: none; }
+        .clickable { cursor: pointer; }
+        
+        /* Template: MASH */
+        .mash-meter { width: 30px; height: 200px; background: #333; border: 2px solid #fff; border-radius: 10px; overflow: hidden; position: absolute; right: 20px; }
+        .mash-fill { width: 100%; background: var(--red); position: absolute; bottom: 0; transition: height 0.1s; }
+        .mash-target { font-size: 100px; transition: transform 0.1s; }
+
+        /* Template: TIMING */
+        .track { width: 300px; height: 20px; background: #444; border-radius: 10px; position: relative; }
+        .zone { height: 100%; background: rgba(0,255,0,0.5); position: absolute; border: 1px solid #fff; box-sizing: border-box; }
+        .cursor { width: 10px; height: 40px; background: var(--gold); position: absolute; top: -10px; transform: translateX(-50%); }
+
+        /* Template: SWIPE */
+        .swipe-obj { font-size: 80px; transition: transform 0.1s; }
+        .swipe-arrow { font-size: 40px; color: rgba(255,255,255,0.5); position: absolute; animation: float 0.5s infinite alternate; pointer-events: none;}
+        @keyframes float { from{transform:translateY(0);} to{transform:translateY(10px);} }
+
+        /* Template: FIND */
+        .grid-item { width: 60px; height: 60px; border-radius: 50%; background: #ddd; display: flex; justify-content: center; align-items: center; font-size: 30px; border: 3px solid #000; }
+
+        button {
+            background: var(--green); border: 4px solid #fff; padding: 20px 40px;
+            font-size: 24px; font-weight: bold; color: white; border-radius: 15px;
+            box-shadow: 0 6px 0 var(--dark-green); margin-top: 20px; cursor: pointer;
+        }
+        button:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--dark-green); }
+
+    </style>
+</head>
+<body>
+
+    <div id="hud">
+        <div>SCORE: <span id="score" class="stat-val">0</span></div>
+        <div id="lives"><div class="life"></div><div class="life"></div><div class="life"></div><div class="life"></div></div>
+    </div>
+
+    <div id="calisto">🧐</div>
+    <div id="stage"></div>
+    <div id="timer-wrap"><div id="timer"></div></div>
+
+    <!-- SCREENS -->
+    <div id="screen-start" class="overlay menu">
+        <h1 style="color:var(--gold); font-size:40px; line-height:1;">CALISTO'S<br>MEGA MIX</h1>
+        <p>40+ Gross Mini-Games!</p>
+        <button onclick="Game.init()">PLAY</button>
+    </div>
+
+    <div id="screen-over" class="overlay menu hidden">
+        <h1 style="color:var(--red);">GAME OVER</h1>
+        <p>Score: <span id="final-score">0</span></p>
+        <button onclick="Game.init()">RETRY</button>
+    </div>
+
+    <div id="overlay-msg" class="overlay hidden">
+        <div id="cmd-text">READY?</div>
+    </div>
+    <div id="flash" class="overlay"></div>
+
+    <script>
+        /* --- AUDIO & SPEECH --- */
+        const AudioSys = {
+            ctx: new (window.AudioContext || window.webkitAudioContext)(),
+            play(type) {
+                if(this.ctx.state === 'suspended') this.ctx.resume();
+                const t = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const g = this.ctx.createGain();
+                osc.connect(g); g.connect(this.ctx.destination);
+
+                if (type === 'win') {
+                    osc.frequency.setValueAtTime(523.25, t);
+                    osc.frequency.setValueAtTime(659.25, t+0.1);
+                    g.gain.exponentialRampToValueAtTime(0.01, t+0.3);
+                    osc.start(t); osc.stop(t+0.3);
+                } else if (type === 'lose') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(200, t);
+                    osc.frequency.linearRampToValueAtTime(50, t+0.4);
+                    g.gain.exponentialRampToValueAtTime(0.01, t+0.4);
+                    osc.start(t); osc.stop(t+0.4);
+                } else if (type === 'pop') {
+                    osc.frequency.setValueAtTime(800, t);
+                    osc.frequency.exponentialRampToValueAtTime(100, t+0.1);
+                    g.gain.exponentialRampToValueAtTime(0.01, t+0.1);
+                    osc.start(t); osc.stop(t+0.1);
+                } else if (type === 'tick') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(1000, t);
+                    g.gain.exponentialRampToValueAtTime(0.01, t+0.05);
+                    osc.start(t); osc.stop(t+0.05);
+                }
+            },
+            speak(text) {
+                if (!('speechSynthesis' in window)) return;
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.rate = 1.2; u.pitch = 0.8; u.volume = 1;
+                window.speechSynthesis.speak(u);
+            }
+        };
+
+        /* --- GAME ENGINE --- */
+        const Game = {
+            score: 0, lives: 4, speed: 1,
+            timer: 0, maxTime: 0, loopId: null,
+            active: false,
+            el: {},
+
+            init() {
+                this.el = {
+                    stage: document.getElementById('stage'),
+                    timer: document.getElementById('timer'),
+                    lives: document.getElementById('lives'),
+                    score: document.getElementById('score'),
+                    calisto: document.getElementById('calisto'),
+                    start: document.getElementById('screen-start'),
+                    over: document.getElementById('screen-over'),
+                    msg: document.getElementById('overlay-msg'),
+                    cmd: document.getElementById('cmd-text'),
+                    flash: document.getElementById('flash')
+                };
+                this.score = 0; this.lives = 4; this.speed = 1;
+                this.el.start.classList.add('hidden');
+                this.el.over.classList.add('hidden');
+                this.updateHUD();
+                this.active = true;
+                this.nextRound();
+            },
+
+            updateHUD() {
+                this.el.score.innerText = this.score;
+                Array.from(this.el.lives.children).forEach((d,i) => {
+                    d.className = i < this.lives ? 'life' : 'life lost';
+                });
+            },
+
+            nextRound() {
+                if (!this.active) return;
+                this.el.stage.innerHTML = '';
+                this.el.calisto.innerText = "🧐";
+                this.el.calisto.style.transform = "scale(1)";
+
+                // Difficulty Scaling
+                this.speed = 1 + (this.score * 0.05);
+                
+                // Pick Game
+                const gameData = GameList[Math.floor(Math.random() * GameList.length)];
+                
+                // Announce
+                this.el.cmd.innerText = gameData.cmd;
+                this.el.msg.classList.remove('hidden');
+                AudioSys.play('tick');
+                AudioSys.speak(gameData.cmd);
+
+                setTimeout(() => {
+                    this.el.msg.classList.add('hidden');
+                    this.runMicrogame(gameData);
+                }, 1000);
+            },
+
+            runMicrogame(data) {
+                if (!this.active) return;
+                
+                // Setup Template
+                const Template = Templates[data.type];
+                const gameObj = Template.setup(this.el.stage, data);
+                
+                // Timer Setup
+                let duration = Math.max(1000, (data.time || 3000) / this.speed);
+                let start = performance.now();
+                
+                const loop = (now) => {
+                    if (!this.active) return;
+                    let elapsed = now - start;
+                    let remaining = duration - elapsed;
+                    
+                    this.el.timer.style.width = (remaining/duration)*100 + "%";
+                    
+                    // Update Logic
+                    if (Template.update) Template.update(gameObj, elapsed, duration);
+
+                    // Check End
+                    if (remaining <= 0) {
+                        this.endRound(gameObj.checkWin(true), gameObj); // true indicates timeout
+                    } else if (gameObj.finished) {
+                        this.endRound(gameObj.result, gameObj);
+                    } else {
+                        this.loopId = requestAnimationFrame(loop);
+                    }
+                };
+                this.loopId = requestAnimationFrame(loop);
+            },
+
+            endRound(win, gameObj) {
+                cancelAnimationFrame(this.loopId);
+                if (gameObj.cleanup) gameObj.cleanup();
+
+                const color = win ? 'rgba(136,204,0,0.6)' : 'rgba(255,68,68,0.6)';
+                this.el.flash.style.background = color;
+                this.el.flash.style.opacity = 1;
+                setTimeout(() => this.el.flash.style.opacity = 0, 150);
+
+                if (win) {
+                    this.score++;
+                    AudioSys.play('win');
+                    this.el.calisto.innerText = "🎩";
+                } else {
+                    this.lives--;
+                    AudioSys.play('lose');
+                    this.el.calisto.innerText = "🤧";
+                }
+                this.updateHUD();
+
+                if (this.lives <= 0) {
+                    this.active = false;
+                    setTimeout(() => {
+                        document.getElementById('final-score').innerText = this.score;
+                        this.el.over.classList.remove('hidden');
+                    }, 1000);
+                } else {
+                    setTimeout(() => this.nextRound(), 800);
+                }
+            }
+        };
+
+        /* --- TEMPLATES --- */
+        const Templates = {
+            // 1. TAP_SPAWN: Tap X items to win
+            TAP_SPAWN: {
+                setup(stage, data) {
+                    const state = { finished: false, result: false, count: data.count || 1 };
+                    for(let i=0; i<state.count; i++) {
+                        const el = document.createElement('div');
+                        el.className = 'obj clickable';
+                        el.innerText = data.asset;
+                        el.style.left = (20 + Math.random()*60) + '%';
+                        el.style.top = (20 + Math.random()*60) + '%';
+                        
+                        // Move logic if needed
+                        if(data.move) {
+                           el.dataset.vx = (Math.random()-0.5)*5;
+                           el.dataset.vy = (Math.random()-0.5)*5;
+                        }
+
+                        el.onpointerdown = (e) => {
+                            e.stopPropagation();
+                            el.innerText = "✨";
+                            el.style.pointerEvents = 'none';
+                            el.style.transform = "scale(1.5)";
+                            el.style.opacity = 0;
+                            AudioSys.play('pop');
+                            state.count--;
+                            if(state.count <= 0) { state.result = true; state.finished = true; }
+                        };
+                        stage.appendChild(el);
+                    }
+                    state.els = Array.from(stage.children);
+                    return state;
+                },
+                update(state) {
+                    if (state.els[0].dataset.vx) {
+                        state.els.forEach(el => {
+                            if(el.style.opacity === "0") return;
+                            let x = parseFloat(el.style.left);
+                            let y = parseFloat(el.style.top);
+                            x += parseFloat(el.dataset.vx);
+                            y += parseFloat(el.dataset.vy);
+                            if(x<0||x>90) el.dataset.vx *= -1;
+                            if(y<0||y>90) el.dataset.vy *= -1;
+                            el.style.left = x+'%'; el.style.top = y+'%';
+                        });
+                    }
+                },
+                checkWin(timeout) { return false; } // If time runs out, you lose
+            },
+
+            // 2. SWIPE: Detect directional swipe
+            SWIPE: {
+                setup(stage, data) {
+                    const state = { finished: false, result: false, startY: 0, startX: 0 };
+                    const el = document.createElement('div');
+                    el.className = 'obj swipe-obj';
+                    el.innerText = data.asset;
+                    stage.appendChild(el);
+                    
+                    // Hint Arrow
+                    const arr = document.createElement('div');
+                    arr.className = 'swipe-arrow';
+                    arr.innerText = data.dir === 'up' ? '⬆️' : '⬇️';
+                    arr.style.top = data.dir === 'up' ? '20%' : '70%';
+                    stage.appendChild(arr);
+
+                    el.onpointerdown = (e) => {
+                        state.startX = e.clientX; state.startY = e.clientY;
+                        el.setPointerCapture(e.pointerId);
+                    };
+                    el.onpointermove = (e) => {
+                        if(!state.startY) return;
+                        let dx = e.clientX - state.startX;
+                        let dy = e.clientY - state.startY;
+                        el.style.transform = `translate(${dx}px, ${dy}px)`;
+                    };
+                    el.onpointerup = (e) => {
+                        let dy = e.clientY - state.startY;
+                        let threshold = 50;
+                        let success = false;
+                        if (data.dir === 'up' && dy < -threshold) success = true;
+                        if (data.dir === 'down' && dy > threshold) success = true;
+                        
+                        if (success) {
+                            state.result = true; state.finished = true;
+                            AudioSys.play('pop');
+                        } else {
+                            el.style.transform = 'none';
+                        }
+                        state.startY = 0;
+                    };
+                    return state;
+                },
+                checkWin(timeout) { return false; }
+            },
+
+            // 3. MASH: Survival or Fill
+            MASH: {
+                setup(stage, data) {
+                    // mode: 'keep_low' (survival) or 'fill' (action)
+                    const state = { 
+                        finished: false, result: false, 
+                        val: data.mode === 'fill' ? 0 : 50,
+                        mode: data.mode 
+                    };
+                    
+                    stage.innerHTML = `
+                        <div class="obj mash-target" id="m-btn">${data.asset}</div>
+                        <div class="mash-meter"><div class="mash-fill" id="m-fill" style="height:${state.val}%"></div></div>
+                    `;
+                    
+                    const btn = document.getElementById('m-btn');
+                    const fill = document.getElementById('m-fill');
+                    state.fillEl = fill;
+                    state.btn = btn;
+
+                    stage.onpointerdown = (e) => {
+                        if(data.mode === 'fill') state.val += 15;
+                        else state.val -= 15; 
+                        
+                        btn.style.transform = "scale(0.9)";
+                        setTimeout(()=>btn.style.transform="scale(1)", 50);
+                        AudioSys.play('pop');
+                    };
+
+                    return state;
+                },
+                update(state, elapsed, duration) {
+                    // Auto change
+                    state.val += (state.mode === 'fill') ? -0.5 : 1.0;
+                    if(state.val < 0) state.val = 0;
+                    if(state.val > 100) state.val = 100;
+                    
+                    state.fillEl.style.height = state.val + '%';
+                    
+                    // Color changes
+                    if(state.mode === 'keep_low' && state.val > 80) state.fillEl.style.background = 'white';
+                    else state.fillEl.style.background = 'var(--red)';
+
+                    // Logic
+                    if(state.mode === 'fill' && state.val >= 100) {
+                        state.result = true; state.finished = true;
+                    }
+                    if(state.mode === 'keep_low' && state.val >= 100) {
+                        state.result = false; state.finished = true; state.btn.innerText = "💥";
+                    }
+                },
+                checkWin(timeout) { 
+                    // If timeout, Fill = Lose, Keep_Low = Win
+                    return this.mode === 'keep_low';
+                }
+            },
+
+            // 4. TIMING: Stop cursor in zone OR Pick Nose logic
+            TIMING: {
+                setup(stage, data) {
+                    const state = { finished: false, result: false };
+                    
+                    if (data.style === 'linear') {
+                         // Pick Nose Style
+                        stage.innerHTML = `
+                            <div style="width:200px; height:200px; background:var(--skin); border:5px solid #000; border-radius:50%; position:relative; overflow:hidden;">
+                                <div style="width:50px; height:50px; background:#000; border-radius:50%; position:absolute; top:80px; left:75px;" id="t-hole"></div>
+                                <div style="width:40px; height:150px; background:pink; border:4px solid #000; position:absolute; bottom:-150px; left:80px;" id="t-finger"></div>
+                            </div>
+                        `;
+                        state.finger = document.getElementById('t-finger');
+                        state.hole = document.getElementById('t-hole');
+                        state.isLinear = true;
+                    } else {
+                        // Bar Style
+                        stage.innerHTML = `
+                            <div class="track">
+                                <div class="zone" style="left:${20+Math.random()*60}%; width:20%;"></div>
+                                <div class="cursor" id="t-cur"></div>
+                            </div>
+                            <div style="margin-top:50px; font-size:50px;">${data.asset}</div>
+                        `;
+                        state.cursor = document.getElementById('t-cur');
+                        state.zone = stage.querySelector('.zone');
+                        state.isLinear = false;
+                    }
+
+                    stage.onpointerdown = () => {
+                        if (state.isLinear) {
+                            // Check overlap via math (simplifying for robustness)
+                            // Finger X is oscillating. Center is X=0 offset.
+                            // See update logic
+                            let pos = parseFloat(state.finger.dataset.pos || 0);
+                            if (Math.abs(pos) < 20) { // 20px tolerance
+                                state.result = true; 
+                                state.finger.style.bottom = '-50px';
+                            } else {
+                                state.finger.style.transform += ' rotate(45deg)';
+                            }
+                        } else {
+                            // Bar Check
+                            let cp = state.cursor.getBoundingClientRect();
+                            let zp = state.zone.getBoundingClientRect();
+                            if (cp.left > zp.left && cp.right < zp.right) state.result = true;
+                        }
+                        AudioSys.play('pop');
+                        state.finished = true;
+                    };
+                    return state;
+                },
+                update(state, elapsed) {
+                    if (state.isLinear) {
+                        let range = 80;
+                        let speed = 0.005;
+                        let x = Math.sin(elapsed * speed) * range;
+                        state.finger.style.transform = `translateX(${x}px)`;
+                        state.finger.dataset.pos = x;
+                    } else {
+                        let pct = (Math.sin(elapsed * 0.005) + 1) * 50; // 0 to 100
+                        state.cursor.style.left = pct + '%';
+                    }
+                },
+                checkWin(timeout) { return false; }
+            },
+
+            // 5. FIND: Pick correct item
+            FIND: {
+                setup(stage, data) {
+                    const state = { finished: false, result: false };
+                    let grid = document.createElement('div');
+                    grid.style.display = 'grid';
+                    grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+                    grid.style.gap = '10px';
+                    
+                    let correctIdx = Math.floor(Math.random()*9);
+                    
+                    for(let i=0; i<9; i++) {
+                        let item = document.createElement('div');
+                        item.className = 'grid-item clickable';
+                        item.innerText = (i === correctIdx) ? data.correct : data.decoy;
+                        item.onpointerdown = (e) => {
+                            e.stopPropagation();
+                            if(i === correctIdx) {
+                                state.result = true; state.finished = true;
+                                AudioSys.play('pop');
+                            } else {
+                                item.style.background = '#555';
+                                AudioSys.play('lose'); // penalty sound
+                            }
+                        };
+                        grid.appendChild(item);
+                    }
+                    stage.appendChild(grid);
+                    return state;
+                },
+                checkWin(timeout) { return false; }
+            }
+        };
+
+        /* --- 44 MINI-GAMES --- */
+        const GameList = [
+            // --- TAP (Action) ---
+            { cmd: "POP!", type: "TAP_SPAWN", asset: "🔴", count: 3 },
+            { cmd: "SWAT!", type: "TAP_SPAWN", asset: "🪰", count: 1, move: true },
+            { cmd: "CLIP!", type: "TAP_SPAWN", asset: "💅", count: 5 },
+            { cmd: "STITCH!", type: "TAP_SPAWN", asset: "🩹", count: 3 },
+            { cmd: "POKE!", type: "TAP_SPAWN", asset: "🤰", count: 2 },
+            { cmd: "BUTTON!", type: "TAP_SPAWN", asset: "🔘", count: 4 },
+            { cmd: "SQUISH!", type: "TAP_SPAWN", asset: "🕷️", count: 1, move: true },
+            { cmd: "PET!", type: "TAP_SPAWN", asset: "🐕", count: 5 },
+            { cmd: "TYPE!", type: "TAP_SPAWN", asset: "⌨️", count: 6 },
+            { cmd: "CRACK!", type: "TAP_SPAWN", asset: "🥚", count: 3 },
+            { cmd: "SHOOT!", type: "TAP_SPAWN", asset: "👾", count: 1, move: true },
+            { cmd: "CLEAN!", type: "TAP_SPAWN", asset: "💩", count: 4 },
+
+            // --- SWIPE (Direction) ---
+            { cmd: "FLICK!", type: "SWIPE", asset: "🤢", dir: "up" },
+            { cmd: "PULL!", type: "SWIPE", asset: "🪱", dir: "down" },
+            { cmd: "WIPE!", type: "SWIPE", asset: "🍑", dir: "up" },
+            { cmd: "SNIFF!", type: "SWIPE", asset: "👃", dir: "up" },
+            { cmd: "SHAVE!", type: "SWIPE", asset: "🧔", dir: "down" },
+            { cmd: "PEEL!", type: "SWIPE", asset: "🍌", dir: "down" },
+            { cmd: "FLOSS!", type: "SWIPE", asset: "🦷", dir: "down" },
+            { cmd: "PLUCK!", type: "SWIPE", asset: "🤨", dir: "up" },
+            { cmd: "LICK!", type: "SWIPE", asset: "👅", dir: "up" },
+            { cmd: "ZIP!", type: "SWIPE", asset: "👖", dir: "up" },
+            { cmd: "UNCLOG!", type: "SWIPE", asset: "🚽", dir: "down" },
+            { cmd: "COMB!", type: "SWIPE", asset: "💇", dir: "down" },
+            { cmd: "SCRATCH!", type: "SWIPE", asset: "🦟", dir: "up" },
+
+            // --- MASH (Endurance) ---
+            { cmd: "HOLD IT!", type: "MASH", asset: "🤧", mode: "keep_low" }, // Sneeze
+            { cmd: "PUMP!", type: "MASH", asset: "🎈", mode: "fill" },
+            { cmd: "BRUSH!", type: "MASH", asset: "🪥", mode: "fill" },
+            { cmd: "GARGLE!", type: "MASH", asset: "🥤", mode: "fill" },
+            { cmd: "RUN!", type: "MASH", asset: "🏃", mode: "fill" },
+            { cmd: "EAT!", type: "MASH", asset: "🍔", mode: "fill" },
+            { cmd: "CHARGE!", type: "MASH", asset: "🔋", mode: "fill" },
+            { cmd: "DIGEST!", type: "MASH", asset: "🤢", mode: "keep_low" },
+            { cmd: "CHUG!", type: "MASH", asset: "🍼", mode: "fill" },
+
+            // --- TIMING (Precision) ---
+            { cmd: "PICK!", type: "TIMING", style: "linear" }, // Classic Nose
+            { cmd: "CATCH!", type: "TIMING", asset: "💧", style: "bar" },
+            { cmd: "DROPS!", type: "TIMING", asset: "👁️", style: "bar" },
+            { cmd: "LOCK!", type: "TIMING", asset: "🔒", style: "bar" },
+            { cmd: "KISS!", type: "TIMING", asset: "💋", style: "bar" },
+            { cmd: "SLAP!", type: "TIMING", asset: "✋", style: "bar" },
+
+            // --- FIND (Logic) ---
+            { cmd: "GOLD!", type: "FIND", correct: "✨", decoy: "🪨" },
+            { cmd: "BAD TOOTH!", type: "FIND", correct: "🦷", decoy: "💎" },
+            { cmd: "FIND BUG!", type: "FIND", correct: "🐛", decoy: "🍃" },
+            { cmd: "ODD ONE!", type: "FIND", correct: "👽", decoy: "😐" },
+        ];
+
+    </script>
+</body>
+</html>
+
